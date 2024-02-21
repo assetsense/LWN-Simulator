@@ -1,0 +1,7 @@
+{
+    "simulatorServer":"localhost:8000",
+    "chirpstackServer": "localhost:8080",
+    "apiUrl" : "https://qa65.assetsense.com/c2/services/deviceservice/getdevices",
+    "username" : "harsha.iotqa5",
+    "password" : "HydeVil#71"
+}

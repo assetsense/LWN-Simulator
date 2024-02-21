@@ -1,18 +1,18 @@
 const grpc = require("@grpc/grpc-js");
-
+const c2 = require('./c2.json')
 const { DeviceServiceClient} = require("@chirpstack/chirpstack-api/api/device_grpc_pb");
 const {CreateDeviceRequest, CreateDeviceKeysRequest ,DeviceQueueItem } = require("@chirpstack/chirpstack-api/api/device_pb");
 const {Device , DeviceKeys} = require("@chirpstack/chirpstack-api/api/device_pb");
 
 // This must point to the ChirpStack API interface.
-const server = "localhost:8080";
+const server = c2.chirpstackServer;
 
 var devices = {};
 
 async function getDevicesFromC2() {
-    const apiUrl = 'https://qa65.assetsense.com/c2/services/deviceservice/getdevices';
-    const username = 'harsha.iotqa5';
-    const password = 'HydeVil#71';
+    const apiUrl = c2.apiUrl;
+    const username = c2.username;
+    const password = c2.password;
     const postData = "{}";
     const authString = `${username}:${password}`;
     const encodedAuth = btoa(authString);
