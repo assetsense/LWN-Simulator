@@ -40,7 +40,7 @@ async function getDevicesFromC2() {
 
 async function main() {
     await getDevicesFromC2();
-    const appId = "5e373f1b-eea5-4ecf-8165-20099817724a";
+    const appId = "b59f5630-6220-4731-a66e-4dade01ad76c";
     const profileId = "e02422c6-f46d-42c1-8c63-756fda1d3c62";
     const apiToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjYwOGNjMWZkLWRkMjgtNDEzMy1iOTVkLWJjODNkY2I4ZjA3MSIsInR5cCI6ImtleSJ9.IkOwMfjAwyKeM5r1w2gwicOVRqVTmc-l6na5fORjx54";
     await addingDevice(server,apiToken,devices,appId,profileId);
@@ -65,13 +65,13 @@ async function addingDevice(server,apiToken,deviceList,applicationId,deviceProfi
             const req = new CreateDeviceRequest();
             const device = new Device();
 
-            device.setDevEui(dev.deviceCode);
+            device.setDevEui(dev.deviceCode+"");
             device.setName(dev.deviceName);
             device.setApplicationId(applicationId);
             device.setDeviceProfileId(deviceProfileId);
             device.setDescription("Registering device via API");
             device.setIsDisabled(false);
-            device.setSkipFcntCheck(false);
+            device.setSkipFcntCheck(true);
             device.setIsDisabled(false);
             req.setDevice(device);
 
@@ -79,7 +79,7 @@ async function addingDevice(server,apiToken,deviceList,applicationId,deviceProfi
             const keysReq = new CreateDeviceKeysRequest();
             const keys = new DeviceKeys();
 
-            keys.setDevEui(dev.deviceCode);
+            keys.setDevEui(dev.deviceCode + "");
             keys.setAppKey(dev.applicationKey);
             keys.setNwkKey(dev.applicationKey);
             keysReq.setDeviceKeys(keys);
