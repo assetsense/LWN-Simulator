@@ -1,7 +1,18 @@
 {
-    "simulatorServer":"localhost:8000",
+    "simulatorServer":"http://localhost:8000/",
     "chirpstackServer": "localhost:8080",
-    "apiUrl" : "https://qa65.assetsense.com/c2/services/deviceservice/getdevices",
+    "c2server" : "https://qa65.assetsense.com/c2/services/deviceservice/getdevices",
     "username" : "harsha.iotqa5",
-    "password" : "HydeVil#71"
+    "password" : "HydeVil#71",
+    "createDevices": true,
+    "joinDelay": 5,
+    "dataPathS": "datasamples/stype_sample/S.bin",
+    "dataPathL": "datasamples/ltype_sample/L_1450303679325520_",
+    "sendInterval": 60,
+    "ackTimeout": 30,
+    "rxDelay": 0,
+    "rxDurationOpen": 30000,
+    "dataRate": 0,
+    "configDirname":"components"
+
 }

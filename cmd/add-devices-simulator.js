@@ -1,9 +1,9 @@
 const fs = require('fs');
-const c2 = require('./c2.json')
-const apiUrl = c2.apiUrl;
+const c2 = require('./c2.json');
+
 const username = c2.username;
 const password = c2.password;
-const postData = "{}";
+
 const authString = `${username}:${password}`;
 const encodedAuth = btoa(authString);
 
@@ -11,13 +11,13 @@ var devices = {};
 
 async function getDevicesFromC2() {
 
-    await fetch(apiUrl, {
+    await fetch(c2.c2server, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Basic ${encodedAuth}`, // Include your Basic Authentication credentials here
         },
-        body: postData,
+        body: '{}',
     })
         .then(response => {
             if (!response.ok) {
@@ -29,22 +29,12 @@ async function getDevicesFromC2() {
             devices = data.Device;
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error(error);
+            return;
         });
 }
 
 async function addDevicesToSimulator() {
-
-    await fetch("http://localhost:8000/dashboard/")
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response;
-        })
-        .catch(error => {
-            console.log('Fetch error:');
-        });
 
     for (let i = 0; i < devices.length; i++) {
         var dev = devices[i];
@@ -52,14 +42,12 @@ async function addDevicesToSimulator() {
         if (!dev.hasOwnProperty("applicationKey")) {
             continue;
         }
-        console.log(dev.deviceName);
-        const filePathLtype = "datasamples/stype_sample/S.bin";
-        const filePathStype = "datasamples/ltype_sample/L_1450303679325520_0.bin";
         var binaryData;
-        if (dev.deviceName[0] == 'S') {
-            binaryData = fs.readFileSync(filePathStype).toString('hex');
-        } else if (dev.deviceName[0] == 'V') {
-            binaryData = fs.readFileSync(filePathLtype).toString('hex');
+        //change to device type
+        if (dev.deviceType.id == 6199) {
+            binaryData = fs.readFileSync(c2.dataPathS).toString('hex');
+        } else if (dev.deviceType.id = 6165) {
+            binaryData = fs.readFileSync(c2.dataPathL).toString('hex');
         } else {
             binaryData = "";
         }
@@ -89,8 +77,8 @@ async function addDevicesToSimulator() {
                 },
                 "configuration": {
                     "region": 1,
-                    "sendInterval": 60,
-                    "ackTimeout": 30,
+                    "sendInterval": c2.sendInterval,
+                    "ackTimeout": c2.ackTimeout,
                     "range": 10000,
                     "disableFCntDown": true,
                     "supportedOtaa": true,
@@ -104,8 +92,8 @@ async function addDevicesToSimulator() {
                 },
                 "rxs": [
                     {
-                        "delay": 1000,
-                        "durationOpen": 30000,
+                        "delay": c2.rxDelay,
+                        "durationOpen": c2.rxDurationOpen,
                         "channel": {
                             "active": false,
                             "enableUplink": false,
@@ -114,11 +102,11 @@ async function addDevicesToSimulator() {
                             "minDR": 0,
                             "maxDR": 0
                         },
-                        "dataRate": 0
+                        "dataRate": c2.dataRate
                     },
                     {
-                        "delay": 1000,
-                        "durationOpen": 30000,
+                        "delay": c2.rxDelay,
+                        "durationOpen": c2.rxDurationOpen,
                         "channel": {
                             "active": true,
                             "enableUplink": false,
@@ -127,14 +115,14 @@ async function addDevicesToSimulator() {
                             "minDR": 0,
                             "maxDR": 0
                         },
-                        "dataRate": 0
+                        "dataRate": c2.dataRate
                     }
                 ]
             }
         };
 
 
-        await fetch("http://localhost:8000/api/add-device", {
+        await fetch(c2.simulatorServer + "api/add-device", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -145,15 +133,15 @@ async function addDevicesToSimulator() {
                 return response.json();
             })
             .then(data => {
+                console.log(dev.deviceName);
                 if (data.code == 0) {
                     console.log("Device added successfully!");
-                    return;
                 } else {
                     console.log(data.status);
                 }
             })
             .catch(error => {
-                console.log('Error: webserver is not running');
+                console.log('Error: simulator webserver is not running');
             });
     };
 
@@ -162,9 +150,7 @@ async function addDevicesToSimulator() {
 }
 
 async function startSimulator() {
-    const apiUrl = "http://localhost:8000/api/start";
-
-    fetch(apiUrl)
+    await fetch(c2.simulatorServer + "api/start")
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -175,16 +161,17 @@ async function startSimulator() {
             console.log("Simulator has been started!");
         })
         .catch(error => {
-            console.error('Error during fetch:', error.message);
+            console.error('Error: simulator webserver is not running');
         });
 }
 
 async function main() {
-    console.log("main");
-    await getDevicesFromC2();
-    await addDevicesToSimulator();
-    await startSimulator();
-}
 
+    if (c2.createDevices == true) {
+        await getDevicesFromC2();
+        await addDevicesToSimulator();
+    }
+    //await startSimulator();
+}
 
 main();
