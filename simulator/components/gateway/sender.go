@@ -7,21 +7,8 @@ import (
 
 	pkt "github.com/arslab/lwnsimulator/simulator/resources/communication/packets"
 	"github.com/arslab/lwnsimulator/simulator/resources/communication/udp"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 
 	"github.com/arslab/lwnsimulator/simulator/util"
-)
-
-var (
-	pushDataCounter = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "gateway_data_sent_total",
-		Help: "The total number of gateway PUSH DATA",
-	})
-	pullDataCounter = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "gateway_pull_data_total",
-		Help: "The total number of gateway PULL DATA",
-	})
 )
 
 func (g *Gateway) SenderVirtual() {
@@ -54,7 +41,6 @@ func (g *Gateway) SenderVirtual() {
 
 		} else {
 			g.Print("PUSH DATA send", nil, util.PrintBoth)
-			pushDataCounter.Inc()
 		}
 
 	}
@@ -90,8 +76,6 @@ func (g *Gateway) SenderReal() {
 		} else {
 			msg := fmt.Sprintf("Forward PUSH DATA to %v:%v", g.Info.AddrIP, g.Info.Port)
 			g.Print(msg, nil, util.PrintBoth)
-
-			pushDataCounter.Inc()
 		}
 
 	}
@@ -148,7 +132,6 @@ func (g *Gateway) KeepAlive() {
 				g.Print("", err, util.PrintBoth)
 			} else {
 				g.Print("PULL DATA send", nil, util.PrintBoth)
-				pullDataCounter.Inc()
 			}
 
 		}

@@ -13,21 +13,18 @@ import (
 )
 
 type Forwarder struct {
-	DevToGw  map[lorawan.EUI64]map[lorawan.EUI64]*buffer.BufferUplink            // populates in setup and can update itself
-	GwtoDev  map[uint32]map[lorawan.EUI64]map[lorawan.EUI64]*dl.ReceivedDownlink // populates with register/unRegister
+	DevToGw  map[lorawan.EUI64]map[lorawan.EUI64]*buffer.BufferUplink            //si popola nel setup e può aggiornarsi
+	GwtoDev  map[uint32]map[lorawan.EUI64]map[lorawan.EUI64]*dl.ReceivedDownlink // si popola con register/unRegister
 	Devices  map[lorawan.EUI64]m.InfoDevice
 	Gateways map[lorawan.EUI64]m.InfoGateway
 	Mutex    sync.Mutex
 }
 
-// GPS offset compensates for the drift between UTC and GPS time
-const GPSOffset = 18000
-
 func createPacket(info pkt.RXPK) pkt.RXPK {
 
 	tnow := time.Now()
 	offset, _ := time.Parse(time.RFC3339, "1980-01-06T00:00:00Z")
-	tmms := tnow.UnixMilli() - offset.UnixMilli() + GPSOffset
+	tmms := tnow.Unix() - offset.Unix()
 
 	rxpk := pkt.RXPK{
 
@@ -42,7 +39,7 @@ func createPacket(info pkt.RXPK) pkt.RXPK {
 		DatR:      info.DatR,
 		Brd:       0,
 		CodR:      info.CodR,
-		RSSI:      info.RSSI,
+		RSSI:      -60,
 		LSNR:      7,
 		Size:      info.Size,
 		Data:      info.Data,
