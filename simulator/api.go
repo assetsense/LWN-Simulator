@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"strings"
 	"time"
@@ -21,6 +22,24 @@ import (
 	"github.com/arslab/lwnsimulator/socket"
 	socketio "github.com/googollee/go-socket.io"
 )
+
+type C2Config struct {
+	SimulatorServer  string `json:"simulatorServer"`
+	ChirpstackServer string `json:"chirpstackServer"`
+	C2Server         string `json:"c2server"`
+	Username         string `json:"username"`
+	Password         string `json:"password"`
+	CreateDevices    bool   `json:"createDevices"`
+	JoinDelay        int    `json:"joinDelay"`
+	DataPathS        string `json:"dataPathS"`
+	DataPathL        string `json:"dataPathL"`
+	SendInterval     int    `json:"sendInterval"`
+	AckTimeout       int    `json:"ackTimeout"`
+	RxDelay          int    `json:"rxDelay"`
+	RXDurationOpen   int    `json:"rxDurationOpen"`
+	DataRate         int    `json:"dataRate"`
+	ConfigDirName    string `json:"configDirname"`
+}
 
 func GetIstance() *Simulator {
 
@@ -47,8 +66,22 @@ func (s *Simulator) Run() {
 	s.State = util.Running
 	s.setup()
 
-	s.Print("START", nil, util.PrintBoth)
+	// s.Print("START", nil, util.PrintBoth)
+	path := "c2.json"
 
+	config := C2Config{}
+
+	c2Data, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+
+	err = json.Unmarshal(c2Data, &config)
+	if err != nil {
+		fmt.Println("Error decoding JSON:", err)
+		return
+	}
 	for _, id := range s.ActiveGateways {
 		s.turnONGateway(id)
 	}
@@ -56,7 +89,7 @@ func (s *Simulator) Run() {
 	for _, id := range s.ActiveDevices {
 
 		s.turnONDevice(id)
-		time.Sleep(10 * time.Second)
+		time.Sleep(time.Duration(config.JoinDelay) * time.Second)
 	}
 
 }

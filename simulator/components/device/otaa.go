@@ -1,7 +1,6 @@
 package device
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -38,7 +37,7 @@ func (d *Device) OtaaActivation() {
 		if phy != nil {
 
 			d.Print("Downlink received", nil, util.PrintBoth)
-			fmt.Println(phy)
+			// fmt.Println(phy)
 			_, err := d.ProcessDownlink(*phy)
 			if err != nil {
 				d.Print("", err, util.PrintBoth)
@@ -170,7 +169,7 @@ func (d *Device) ProcessJoinAccept(JoinAccPayload *lorawan.JoinAcceptPayload) (*
 	d.Info.DevAddr = JoinAccPayload.DevAddr
 	d.Info.NetID = JoinAccPayload.HomeNetID
 
-	Delay := 15000
+	Delay := 1000
 	if JoinAccPayload.RXDelay != 0 {
 		Delay = Delay * int(JoinAccPayload.RXDelay)
 	}

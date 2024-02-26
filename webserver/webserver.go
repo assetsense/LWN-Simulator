@@ -84,7 +84,6 @@ func NewWebServer(config *models.ServerConfig, controller cnt.SimulatorControlle
 	{
 		apiRoutes.GET("/start", startSimulator)
 		apiRoutes.GET("/stop", stopSimulator)
-		apiRoutes.GET("/status", simulatorStatus)
 		apiRoutes.GET("/bridge", getRemoteAddress)
 		apiRoutes.GET("/gateways", getGateways)
 		apiRoutes.GET("/devices", getDevices)
@@ -95,6 +94,7 @@ func NewWebServer(config *models.ServerConfig, controller cnt.SimulatorControlle
 		apiRoutes.POST("/add-gateway", addGateway)
 		apiRoutes.POST("/up-gateway", updateGateway)
 		apiRoutes.POST("/bridge/save", saveInfoBridge)
+
 	}
 
 	router.GET("/socket.io/*any", gin.WrapH(serverSocket))
@@ -111,10 +111,6 @@ func startSimulator(c *gin.Context) {
 
 func stopSimulator(c *gin.Context) {
 	c.JSON(http.StatusOK, simulatorController.Stop())
-}
-
-func simulatorStatus(c *gin.Context) {
-	c.JSON(http.StatusOK, simulatorController.Status())
 }
 
 func saveInfoBridge(c *gin.Context) {
