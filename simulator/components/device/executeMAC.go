@@ -21,9 +21,9 @@ const (
 	MaxMargin = int8(64)
 )
 
-// ***************** MANAGE EXECUTE MAC COMMAND ******************
-// *********************Uplink***********************************
-// uplink
+//***************** MANAGE EXECUTE MAC COMMAND ******************
+//*********************Uplink***********************************
+//uplink
 func (d *Device) newMACComands(CmdS []lorawan.Payload) {
 
 	nCommand := len(CmdS) + len(d.Info.Status.DataUplink.FOpts)
@@ -239,7 +239,7 @@ func (d *Device) executeDutyCycleReq(payload []byte) {
 
 }
 
-// require ack
+//require ack
 func (d *Device) executeRXParamSetupReq(payload []byte) {
 
 	c := lorawan.RXParamSetupReqPayload{}
@@ -310,10 +310,6 @@ func (d *Device) executeDevStatusReq() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 	margin := int8(rand.Int()) % MaxMargin //range
-
-	if margin < 0 {
-		margin = -margin
-	}
 
 	if margin <= 32 {
 		margin = margin - 32
@@ -387,7 +383,7 @@ func (d *Device) executeNewChannelReq(payload []byte) {
 
 }
 
-// require ack
+//require ack
 func (d *Device) executeRXTimingSetupReq(payload []byte) {
 
 	c := lorawan.RXTimingSetupReqPayload{}
@@ -419,7 +415,7 @@ func (d *Device) executeRXTimingSetupReq(payload []byte) {
 	d.Info.Status.DataUplink.AckMacCommand.SetRXTimingSetupAns(response)
 }
 
-// require ack
+//require ack
 func (d *Device) executeDLChannelReq(payload []byte) {
 
 	switch d.Info.Configuration.Region.GetCode() {

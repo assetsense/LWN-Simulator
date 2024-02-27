@@ -11,7 +11,12 @@ import (
 
 func GetPath() (string, error) {
 
-	path := GetConfigDirname()
+	homepath, errorPath := os.Getwd()
+	if errorPath != nil {
+		return "", errorPath
+	}
+
+	path := homepath + "/" + GetConfigDirname()
 	err := CreateConfigDir(path)
 	if err != nil {
 		return "", err
@@ -22,7 +27,7 @@ func GetPath() (string, error) {
 
 func GetConfigDirname() string {
 
-	info, err := models.GetConfigFile("config.json")
+	info, err := models.GetConfigFile("c2.json")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,6 +56,33 @@ func CreateConfigFiles() {
 	for i, _ := range path {
 
 		data := "{}"
+		if i == 0 {
+			data = `{
+				"nextIDDev": 0,
+				"nextIDGw": 1,
+				"bridgeAddress": "localhost:1700"
+			}`
+		} else if i == 1 {
+			data = `{
+				"0": {
+					"id": 0,
+					"info": {
+						"macAddress": "c8fd50b13d204e38",
+						"keepAlive": 30,
+						"active": true,
+						"typeGateway": false,
+						"name": "test-gw",
+						"location": {
+							"latitude": 0,
+							"longitude": 0,
+							"altitude": 0
+						},
+						"ip": "",
+						"port": ""
+					}
+				}
+			}`
+		}
 
 		_, err = os.Create(path[i])
 		if err != nil {

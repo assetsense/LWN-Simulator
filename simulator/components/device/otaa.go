@@ -2,7 +2,6 @@ package device
 
 import (
 	"math/rand"
-	"strconv"
 	"time"
 
 	"github.com/arslab/lwnsimulator/simulator/util"
@@ -32,14 +31,13 @@ func (d *Device) OtaaActivation() {
 
 		d.SendJoinRequest()
 
-		d.Print("Open RXs for "+strconv.Itoa(int(d.Info.RX[0].Channel.FrequencyDownlink))+
-			" and "+strconv.Itoa(int(d.Info.RX[1].Channel.FrequencyDownlink)), nil, util.PrintBoth)
+		d.Print("Open RXs", nil, util.PrintBoth)
 
 		phy := d.Class.ReceiveWindows(JOINACCEPTDELAY1, JOINACCEPTDELAY2)
 		if phy != nil {
 
 			d.Print("Downlink received", nil, util.PrintBoth)
-
+			// fmt.Println(phy)
 			_, err := d.ProcessDownlink(*phy)
 			if err != nil {
 				d.Print("", err, util.PrintBoth)
@@ -113,12 +111,9 @@ func (d *Device) ProcessJoinAccept(JoinAccPayload *lorawan.JoinAcceptPayload) (*
 	var err error
 
 	//setkeys
-	d.Info.NwkSKey, err = act.GetKey(JoinAccPayload.HomeNetID, JoinAccPayload.JoinNonce, d.Info.DevNonce, d.Info.AppKey, act.PadNwkSKey)
-	if err != nil {
-		return nil, err
-	}
+	d.Info.NwkSKey, err = act.GetKey(d.Info.NetID, JoinAccPayload.JoinNonce, d.Info.DevNonce, d.Info.AppKey, act.PadNwkSKey)
+	d.Info.AppSKey, err = act.GetKey(d.Info.NetID, JoinAccPayload.JoinNonce, d.Info.DevNonce, d.Info.AppKey, act.PadAppSKey)
 
-	d.Info.AppSKey, err = act.GetKey(JoinAccPayload.HomeNetID, JoinAccPayload.JoinNonce, d.Info.DevNonce, d.Info.AppKey, act.PadAppSKey)
 	if err != nil {
 		return nil, err
 	}

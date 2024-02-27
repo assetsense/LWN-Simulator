@@ -3,11 +3,7 @@ package device
 import (
 	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
-
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 
 	"github.com/arslab/lwnsimulator/simulator/components/device/classes"
 	"github.com/arslab/lwnsimulator/simulator/components/device/features/adr"
@@ -15,21 +11,6 @@ import (
 	rp "github.com/arslab/lwnsimulator/simulator/components/device/regional_parameters"
 	"github.com/arslab/lwnsimulator/simulator/util"
 	"github.com/brocaar/lorawan"
-)
-
-var (
-	uplinkCounter = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "device_uplink_sent_total",
-		Help: "The total number of uplinks sent",
-	})
-	downlinkCounter = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "device_downlink_received_total",
-		Help: "The total number of downlinks received",
-	})
-	ackTimeoutCounter = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "device_ack_timetou_total",
-		Help: "The total number of ACK timeouts",
-	})
 )
 
 func (d *Device) Execute() {
@@ -40,9 +21,7 @@ func (d *Device) Execute() {
 	err = nil
 	downlink = nil
 
-	if d.Info.Status.DoSwitchChannel {
-		d.SwitchChannel()
-	}
+	d.SwitchChannel()
 
 	uplinks := d.CreateUplink()
 	for i := 0; i < len(uplinks); i++ {
@@ -51,22 +30,14 @@ func (d *Device) Execute() {
 		d.Class.SendData(data)
 
 		d.Print("Uplink sent", nil, util.PrintBoth)
-		uplinkCounter.Inc()
 	}
 
-	d.Print("Open RXs for "+strconv.Itoa(int(d.Info.RX[0].Channel.FrequencyDownlink))+
-		" and "+strconv.Itoa(int(d.Info.RX[1].Channel.FrequencyDownlink)), nil, util.PrintBoth)
-
+	d.Print("Open RXs", nil, util.PrintBoth)
 	phy := d.Class.ReceiveWindows(0, 0)
 
 	if phy != nil {
 
 		d.Print("Downlink Received", nil, util.PrintBoth)
-		downlinkCounter.Inc()
-
-		if d.Info.Status.Mode != util.Activation {
-			d.Info.Status.DoSwitchChannel = false
-		}
 
 		downlink, err = d.ProcessDownlink(*phy)
 		if err != nil {
@@ -81,19 +52,17 @@ func (d *Device) Execute() {
 			if d.Info.Status.Mode != util.Retransmission {
 				d.FPendingProcedure(downlink)
 			}
+
 		}
 
 	} else {
 
 		d.Print("None downlinks Received", nil, util.PrintBoth)
 
-		d.Info.Status.DoSwitchChannel = true
-
 		timerAckTimeout := time.NewTimer(d.Info.Configuration.AckTimeout)
 		<-timerAckTimeout.C
-
 		d.Print("ACK Timeout", nil, util.PrintBoth)
-		ackTimeoutCounter.Inc()
+
 	}
 
 	d.ADRProcedure()
@@ -170,7 +139,6 @@ func (d *Device) FPendingProcedure(downlink *dl.InformationDownlink) {
 			if phy != nil {
 
 				d.Print("Downlink Received", nil, util.PrintBoth)
-				downlinkCounter.Inc()
 
 				downlink, err = d.ProcessDownlink(*phy)
 				if err != nil {
@@ -194,7 +162,6 @@ func (d *Device) FPendingProcedure(downlink *dl.InformationDownlink) {
 				<-timerAckTimeout.C
 
 				d.Print("ACK Timeout", nil, util.PrintBoth)
-				ackTimeoutCounter.Inc()
 
 			}
 
@@ -238,8 +205,10 @@ func (d *Device) ADRProcedure() {
 			if msg != "" {
 				d.Print(msg, nil, util.PrintBoth)
 			}
+
 		}
 	}
+
 }
 
 func (d *Device) SwitchChannel() {
@@ -254,7 +223,7 @@ func (d *Device) SwitchChannel() {
 	var indexGroup int
 	regionCode := d.Info.Configuration.Region.GetCode()
 
-	if regionCode == rp.Code_Us915 || regionCode == rp.Code_Au915 {
+	if regionCode == rp.Code_Us915 {
 
 		indexGroup = int(d.Info.Status.IndexchannelActive / 8)
 
@@ -271,7 +240,6 @@ func (d *Device) SwitchChannel() {
 			break
 
 		case 1, 2, 3, 4, 5, 6:
-
 			indexGroup++
 			break
 
@@ -328,15 +296,19 @@ func (d *Device) SwitchChannel() {
 
 						return
 					}
+
 				}
+
 			}
 
 			chanUsed[random] = true
 			lenTrue++
+
 		}
+
 	}
 
-	if lenTrue == lenChannels { // no uplink-enabled channel supports DataRate
+	if lenTrue == lenChannels { //nessun canale abilitato all'uplink supporta il DataRate
 
 		var msg string
 		oldindex := d.Info.Status.IndexchannelActive
@@ -367,6 +339,7 @@ func (d *Device) SwitchChannel() {
 
 		return
 	}
+
 }
 
 func (d *Device) SwitchClass(class int) {
@@ -402,7 +375,7 @@ func (d *Device) SwitchClass(class int) {
 
 }
 
-// se il dispositivo non supporta OTAA non può essere unjoined
+//se il dispositivo non supporta OTAA non può essere unjoined
 func (d *Device) UnJoined() bool {
 
 	if d.Info.Configuration.SupportedOtaa {

@@ -5,23 +5,41 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/brocaar/lorawan"
 
 	"github.com/arslab/lwnsimulator/codes"
 	"github.com/arslab/lwnsimulator/models"
-
 	dev "github.com/arslab/lwnsimulator/simulator/components/device"
 	f "github.com/arslab/lwnsimulator/simulator/components/forwarder"
 	mfw "github.com/arslab/lwnsimulator/simulator/components/forwarder/models"
 	gw "github.com/arslab/lwnsimulator/simulator/components/gateway"
-	c "github.com/arslab/lwnsimulator/simulator/console"
 	"github.com/arslab/lwnsimulator/simulator/util"
 	"github.com/arslab/lwnsimulator/socket"
 	socketio "github.com/googollee/go-socket.io"
 )
+
+type C2Config struct {
+	SimulatorServer  string `json:"simulatorServer"`
+	ChirpstackServer string `json:"chirpstackServer"`
+	C2Server         string `json:"c2server"`
+	Username         string `json:"username"`
+	Password         string `json:"password"`
+	CreateDevices    bool   `json:"createDevices"`
+	JoinDelay        int    `json:"joinDelay"`
+	DataPathS        string `json:"dataPathS"`
+	DataPathL        string `json:"dataPathL"`
+	SendInterval     int    `json:"sendInterval"`
+	AckTimeout       int    `json:"ackTimeout"`
+	RxDelay          int    `json:"rxDelay"`
+	RXDurationOpen   int    `json:"rxDurationOpen"`
+	DataRate         int    `json:"dataRate"`
+	ConfigDirName    string `json:"configDirname"`
+}
 
 func GetIstance() *Simulator {
 
@@ -36,15 +54,11 @@ func GetIstance() *Simulator {
 
 	s.Forwarder = *f.Setup()
 
-	s.Console = c.Console{}
-
 	return &s
 }
 
 func (s *Simulator) AddWebSocket(WebSocket *socketio.Conn) {
-	s.Console.SetupWebSocket(WebSocket)
 	s.Resources.AddWebSocket(WebSocket)
-	s.SetupConsole()
 }
 
 func (s *Simulator) Run() {
@@ -52,15 +66,32 @@ func (s *Simulator) Run() {
 	s.State = util.Running
 	s.setup()
 
-	s.Print("START", nil, util.PrintBoth)
+	// s.Print("START", nil, util.PrintBoth)
+	path := "c2.json"
 
+	config := C2Config{}
+
+	c2Data, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+
+	err = json.Unmarshal(c2Data, &config)
+	if err != nil {
+		fmt.Println("Error decoding JSON:", err)
+		return
+	}
 	for _, id := range s.ActiveGateways {
 		s.turnONGateway(id)
 	}
 
 	for _, id := range s.ActiveDevices {
+
 		s.turnONDevice(id)
+		time.Sleep(time.Duration(config.JoinDelay) * time.Second)
 	}
+
 }
 
 func (s *Simulator) Stop() {
@@ -363,15 +394,15 @@ func (s *Simulator) ToggleStateDevice(Id int) {
 func (s *Simulator) SendMACCommand(cid lorawan.CID, data socket.MacCommand) {
 
 	if !s.Devices[data.Id].IsOn() {
-		s.Console.PrintSocket(socket.EventResponseCommand, s.Devices[data.Id].Info.Name+" is turned off")
+		s.Resources.WebSocket.Emit(socket.EventResponseCommand, s.Devices[data.Id].Info.Name+" is turned off")
 		return
 	}
 
 	err := s.Devices[data.Id].SendMACCommand(cid, data.Periodicity)
 	if err != nil {
-		s.Console.PrintSocket(socket.EventResponseCommand, "Unable to send command: "+err.Error())
+		s.Resources.WebSocket.Emit(socket.EventResponseCommand, "Unable to send command: "+err.Error())
 	} else {
-		s.Console.PrintSocket(socket.EventResponseCommand, "MACCommand will be sent to the next uplink")
+		s.Resources.WebSocket.Emit(socket.EventResponseCommand, "MACCommand will be sent to the next uplink")
 	}
 
 }
@@ -381,7 +412,7 @@ func (s *Simulator) ChangePayload(pl socket.NewPayload) (string, bool) {
 	devEUIstring := hex.EncodeToString(s.Devices[pl.Id].Info.DevEUI[:])
 
 	if !s.Devices[pl.Id].IsOn() {
-		s.Console.PrintSocket(socket.EventResponseCommand, s.Devices[pl.Id].Info.Name+" is turned off")
+		s.Resources.WebSocket.Emit(socket.EventResponseCommand, s.Devices[pl.Id].Info.Name+" is turned off")
 		return devEUIstring, false
 	}
 
@@ -396,7 +427,7 @@ func (s *Simulator) ChangePayload(pl socket.NewPayload) (string, bool) {
 
 	s.Devices[pl.Id].ChangePayload(MType, Payload)
 
-	s.Console.PrintSocket(socket.EventResponseCommand, s.Devices[pl.Id].Info.Name+": Payload changed")
+	s.Resources.WebSocket.Emit(socket.EventResponseCommand, s.Devices[pl.Id].Info.Name+": Payload changed")
 
 	return devEUIstring, true
 }
@@ -404,7 +435,7 @@ func (s *Simulator) ChangePayload(pl socket.NewPayload) (string, bool) {
 func (s *Simulator) SendUplink(pl socket.NewPayload) {
 
 	if !s.Devices[pl.Id].IsOn() {
-		s.Console.PrintSocket(socket.EventResponseCommand, s.Devices[pl.Id].Info.Name+" is turned off")
+		s.Resources.WebSocket.Emit(socket.EventResponseCommand, s.Devices[pl.Id].Info.Name+" is turned off")
 		return
 	}
 
@@ -415,7 +446,8 @@ func (s *Simulator) SendUplink(pl socket.NewPayload) {
 
 	s.Devices[pl.Id].NewUplink(MType, pl.Payload)
 
-	s.Console.PrintSocket(socket.EventResponseCommand, "Uplink queued")
+	s.Resources.WebSocket.Emit(socket.EventResponseCommand, "Uplink queued")
+
 }
 
 func (s *Simulator) ChangeLocation(l socket.NewLocation) bool {

@@ -1,40 +1,39 @@
 install-dep:
-	@go install github.com/rakyll/statik
+	@go get -d -u github.com/rakyll/statik
 	@go get -u -d ./...
 
 build:
-	@echo -e "\e[96mBuilding the \e[95mLWN Simulator\e[39m"
-	@echo -e "\e[96mBuilding the \e[94mUser Interface\e[39m"
-	@cd webserver && statik -src=public -f 1>/dev/null
-	@mkdir -p bin
-	@export GHW_DISABLE_WARNINGS=1
-	@cp -f config.json bin/config.json
-	@echo -e "\e[96mBuilding \e[93mthe source\e[39m"
+	@echo "Building the LWN Simulator"
+	@echo "Building the User Interface"
+	@cd webserver && statik -src=public -f 1
+	@if not exist bin mkdir bin
+	@xcopy "cmd/c2.json" "bin" /F
+	@xcopy "cmd/datasamples" "bin/datasamples" /E /I
+	@echo "Building the source"
 	@go build -o bin/lwnsimulator cmd/main.go
-	@echo -e "\e[92mBuild Complete\e[39m"
-
-build-platform:
-	@echo -e "\e[96mBuilding the \e[95mLWN Simulator (${SUFFIX})\e[39m"
-	@echo -e "\e[96mBuilding the \e[94mUser Interface\e[39m"
-	@cd webserver && statik -src=public -f 1>/dev/null
-	@mkdir -p bin
-	@export GHW_DISABLE_WARNINGS=1
-	@cp -f config.json bin/config.json
-	@echo -e "\e[96mBuilding \e[93mthe source\e[39m"
-	@go build -o bin/lwnsimulator${SUFFIX} cmd/main.go
-	@echo -e "\e[92mBuild Complete\e[39m"
+	@mingw32-make build-x64
+	@mingw32-make build-x86
+	@mingw32-make build-windows
+	@echo "Build Complete"
 
 build-x64:
-	@make build-platform GOOS=linux GOARCH=amd64 SUFFIX="_x64"
+	@set GOOS=linux
+	@set GOARCH=amd64
+	@go build -o bin/lwnsimulators_x64 cmd/main.go
 
 build-x86:
-	@make build-platform GOOS=linux GOARCH=386 SUFFIX="_x86"
+	@set GOOS=linux
+	@set GOARCH=386
+	@go build -o bin/lwnsimulators_x86 cmd/main.go
 
-build-all:
-	@make build-x64
-	@make build-x86
+build-windows:
+	@set GOOS=windows
+	@set GOARCH=amd64
+	@go build -o bin/lwnsimulator.exe cmd/main.go
+
 run:
 	@go run cmd/main.go
 
 run-release:
-	@bin/lwnsimulator
+	@cd bin
+	@lwnsimulator.exe

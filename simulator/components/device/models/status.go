@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/base64"
 	"encoding/json"
 
 	modelClass "github.com/arslab/lwnsimulator/simulator/components/device/classes/models_classes"
@@ -38,10 +37,6 @@ type Status struct {
 	CounterRepUnConfirmedDataUp uint8         `json:"-"`
 	LastMType                   lorawan.MType `json:"-"`
 	LastUplinks                 [][]byte      `json:"-"`
-	Base64                      bool          `json:"base64"`
-	AlignCurrentTime            bool          `json:"aligncurrentTime"`
-
-	DoSwitchChannel bool `json:"-"` // indicate if switching channel is desired
 }
 
 func (s *Status) MarshalJSON() ([]byte, error) {
@@ -53,14 +48,7 @@ func (s *Status) MarshalJSON() ([]byte, error) {
 		mtype = "ConfirmedDataUp"
 	}
 
-	payloadBytes, err := s.Payload.MarshalBinary()
-	if err != nil {
-		panic(err)
-	}
-
-	if s.Base64 {
-		payloadBytes = []byte(base64.StdEncoding.EncodeToString(payloadBytes))
-	}
+	PayloadBytes, _ := s.Payload.MarshalBinary()
 
 	return json.Marshal(&struct {
 		MType   string `json:"mtype"`
@@ -68,7 +56,7 @@ func (s *Status) MarshalJSON() ([]byte, error) {
 		*Alias
 	}{
 		MType:   mtype,
-		Payload: string(payloadBytes),
+		Payload: string(PayloadBytes),
 		Alias:   (*Alias)(s),
 	})
 
@@ -81,7 +69,6 @@ func (s *Status) UnmarshalJSON(data []byte) error {
 	aux := &struct {
 		MType   string `json:"mtype"`
 		Payload string `json:"payload"`
-
 		*Alias
 	}{
 		Alias: (*Alias)(s),
@@ -95,14 +82,6 @@ func (s *Status) UnmarshalJSON(data []byte) error {
 		s.MType = lorawan.ConfirmedDataUp
 	} else {
 		s.MType = lorawan.UnconfirmedDataUp
-	}
-
-	if s.Base64 {
-		payloadBytes, err := base64.StdEncoding.DecodeString(aux.Payload)
-		if err != nil {
-			panic(err)
-		}
-		aux.Payload = string(payloadBytes)
 	}
 
 	s.Payload = &lorawan.DataPayload{
