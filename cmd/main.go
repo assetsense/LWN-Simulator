@@ -300,7 +300,7 @@ func main() {
 			payloadData = hex.EncodeToString(buffer)
 
 			// Access specific properties
-			deviceID, _ := deviceMap["id"].(int)
+			deviceID, _ := deviceMap["id"].(float64)
 			deviceEui, _ := deviceMap["deviceCode"].(string)
 			deviceName, _ := deviceMap["deviceName"].(string)
 			appKey, _ := deviceMap["applicationKey"].(string)
@@ -322,7 +322,7 @@ func main() {
 
 			// Create an instance of DeviceJSON
 			device := DeviceJSON{
-				ID: deviceID,
+				ID: int(deviceID),
 				Info: Info{
 					Name:    deviceName,
 					DevEUI:  deviceEuistring,
@@ -408,10 +408,10 @@ func main() {
 				return
 			}
 
-			code, id, _ := simulatorController.AddDevice(&deviceObj)
 			log.Println(deviceName)
+			code, id, err := simulatorController.AddDevice(&deviceObj)
 			if code == 0 || id == 0 {
-				log.Println("added successfully")
+				log.Println("device added successfully")
 			}
 
 		}

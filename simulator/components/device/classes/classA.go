@@ -57,9 +57,7 @@ func (a *TypeA) ReceiveWindows(delayRX1 time.Duration, delayRX2 time.Duration) *
 		}
 
 	}
-
 	return nil
-
 }
 
 func (a *TypeA) RetransmissionCData(downlink *dl.InformationDownlink) error {
