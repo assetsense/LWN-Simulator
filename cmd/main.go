@@ -105,21 +105,19 @@ type Channel struct {
 }
 
 type C2Config struct {
-	SimulatorServer  string `json:"simulatorServer"`
-	ChirpstackServer string `json:"chirpstackServer"`
-	C2Server         string `json:"c2server"`
-	Username         string `json:"username"`
-	Password         string `json:"password"`
-	CreateDevices    bool   `json:"createDevices"`
-	JoinDelay        int    `json:"joinDelay"`
-	DataPathS        string `json:"dataPathS"`
-	DataPathL        string `json:"dataPathL"`
-	SendInterval     int    `json:"sendInterval"`
-	AckTimeout       int    `json:"ackTimeout"`
-	RxDelay          int    `json:"rxDelay"`
-	RXDurationOpen   int    `json:"rxDurationOpen"`
-	DataRate         int    `json:"dataRate"`
-	ConfigDirName    string `json:"configDirname"`
+	C2Server       string `json:"c2server"`
+	Username       string `json:"username"`
+	Password       string `json:"password"`
+	CreateDevices  bool   `json:"createDevices"`
+	JoinDelay      int    `json:"joinDelay"`
+	DataPathS      string `json:"dataPathS"`
+	DataPathL      string `json:"dataPathL"`
+	SendInterval   int    `json:"sendInterval"`
+	AckTimeout     int    `json:"ackTimeout"`
+	RxDelay        int    `json:"rxDelay"`
+	RXDurationOpen int    `json:"rxDurationOpen"`
+	DataRate       int    `json:"dataRate"`
+	ConfigDirName  string `json:"configDirname"`
 }
 
 func getDevicesFromC2() string {
@@ -223,6 +221,22 @@ func main() {
 			fmt.Println("Error: Credentials is invalid | Device array not found in JSON")
 			return
 		}
+		//opening the datasamples directory
+
+		filesS, err := ioutil.ReadDir(config.DataPathS)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		filesL, err := ioutil.ReadDir(config.DataPathL)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		totalFilesS := len(filesS)
+		totalFilesL := len(filesL)
+		iS := 0
+		iL := 0
 
 		// Iterate over devices
 		for _, device := range devices {
@@ -243,23 +257,6 @@ func main() {
 			var dataPath string
 			var payloadData string
 
-			//opening the datasamples directory
-
-			filesS, err := ioutil.ReadDir(config.DataPathS)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			filesL, err := ioutil.ReadDir(config.DataPathL)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			totalFilesS := len(filesS)
-			totalFilesL := len(filesL)
-			iS := 0
-			iL := 0
-
 			//setting the binary data path as per device type
 			if deviceId == 6199 {
 				//S-Type
@@ -270,7 +267,26 @@ func main() {
 				}
 			} else if deviceId == 6165 {
 				//L-Type
+				axis, ok := deviceMap["axis"].(map[string]interface{})
+				if !ok {
+					fmt.Println("Error: device type not found")
+					continue
+				}
 
+				axisId, _ := axis["id"].(float64)
+				if axisId == 6166 {
+					//x-axis
+
+				} else if axisId == 6167 {
+					//y-axis
+
+				} else if axisId == 6168 {
+					//z-axis
+
+				} else if axisId == 6169 {
+					//tri-axial
+
+				}
 				dataPath = config.DataPathL + filesL[iL].Name()
 				iL = iL + 1
 				if iL >= totalFilesL {
@@ -416,8 +432,11 @@ func main() {
 
 		}
 	}
-
+	//run the simulator
 	simulatorController.Run()
+
+	//the main goroutine finishes before other sub goroutines, due to which the program exits before
+	//finishing the sub goroutines, the user input blocks the main go routine to finish
 	var userInput string
 	_, errr := fmt.Scanln(&userInput)
 	if errr != nil {
