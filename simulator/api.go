@@ -190,15 +190,15 @@ func (s *Simulator) SetGateway(gateway *gw.Gateway, update bool) (int, int, erro
 
 	if gateway.Info.MACAddress == emptyAddr {
 
-		s.Print("Error: MAC Address invalid", nil, util.PrintOnlyConsole)
+		s.Print("Error: MAC Address invalid: "+gateway.Info.Name, nil, util.PrintOnlyConsole)
 		return codes.CodeErrorAddress, -1, errors.New("Error: MAC Address invalid")
 
 	}
 
 	if !update { //new
 
-		gateway.Id = s.NextIDGw
-		s.NextIDGw++
+		// gateway.Id = s.NextIDGw
+		// s.NextIDGw++
 
 	} else {
 
@@ -211,7 +211,7 @@ func (s *Simulator) SetGateway(gateway *gw.Gateway, update bool) (int, int, erro
 	code, err := s.searchName(gateway.Info.Name, gateway.Id, true)
 	if err != nil {
 
-		s.Print("Name already used", nil, util.PrintOnlyConsole)
+		s.Print("Name already used: "+gateway.Info.Name, nil, util.PrintOnlyConsole)
 		return code, -1, err
 
 	}
@@ -219,7 +219,7 @@ func (s *Simulator) SetGateway(gateway *gw.Gateway, update bool) (int, int, erro
 	code, err = s.searchAddress(gateway.Info.MACAddress, gateway.Id, true)
 	if err != nil {
 
-		s.Print("DevEUI already used", nil, util.PrintOnlyConsole)
+		s.Print("DevEUI already used: "+gateway.Info.Name, nil, util.PrintOnlyConsole)
 		return code, -1, err
 
 	}
@@ -244,7 +244,7 @@ func (s *Simulator) SetGateway(gateway *gw.Gateway, update bool) (int, int, erro
 	path = pathDir + "/simulator.json"
 	s.saveComponent(path, &s)
 
-	s.Print("Gateway Saved", nil, util.PrintOnlyConsole)
+	s.Print("Gateway Saved: "+gateway.Info.Name, nil, util.PrintOnlyConsole)
 
 	if gateway.Info.Active {
 
@@ -293,7 +293,7 @@ func (s *Simulator) SetDevice(device *dev.Device, update bool) (int, int, error)
 
 	if device.Info.DevEUI == emptyAddr {
 
-		s.Print("DevEUI invalid", nil, util.PrintOnlyConsole)
+		s.Print("DevEUI invalid: "+device.Info.Name, nil, util.PrintOnlyConsole)
 		return codes.CodeErrorAddress, -1, errors.New("Error: DevEUI invalid")
 
 	}
@@ -313,7 +313,7 @@ func (s *Simulator) SetDevice(device *dev.Device, update bool) (int, int, error)
 	code, err := s.searchName(device.Info.Name, device.Id, false)
 	if err != nil {
 
-		s.Print("Name already used", nil, util.PrintOnlyConsole)
+		s.Print("Name already used: "+device.Info.Name, nil, util.PrintOnlyConsole)
 		return code, -1, err
 
 	}
@@ -321,7 +321,7 @@ func (s *Simulator) SetDevice(device *dev.Device, update bool) (int, int, error)
 	code, err = s.searchAddress(device.Info.DevEUI, device.Id, false)
 	if err != nil {
 
-		s.Print("DevEUI already used", nil, util.PrintOnlyConsole)
+		s.Print("DevEUI already used: "+device.Info.Name, nil, util.PrintOnlyConsole)
 		return code, -1, err
 
 	}
@@ -338,7 +338,7 @@ func (s *Simulator) SetDevice(device *dev.Device, update bool) (int, int, error)
 	path = pathDir + "/simulator.json"
 	s.saveComponent(path, &s)
 
-	s.Print("Device Saved", nil, util.PrintOnlyConsole)
+	s.Print("Device Saved: "+device.Info.Name, nil, util.PrintOnlyConsole)
 
 	if device.Info.Status.Active {
 

@@ -14,7 +14,7 @@ const (
 	ReceiveDelay = 1
 )
 
-//Window is a receive window
+// Window is a receive window
 type Window struct {
 	Channel      c.Channel     `json:"channel"` // RX1's frequency is same of last uplink's frequency
 	Delay        time.Duration `json:"delay"`
@@ -22,12 +22,12 @@ type Window struct {
 	DataRate     uint8         `json:"dataRate"`
 }
 
-//GetListeningFrequency get window's listening frequency
+// GetListeningFrequency get window's listening frequency
 func (w *Window) GetListeningFrequency() uint32 {
 	return w.Channel.FrequencyDownlink
 }
 
-//SetListeningFrequency set window's listening frequency
+// SetListeningFrequency set window's listening frequency
 func (w *Window) SetListeningFrequency(freq uint32) {
 	w.Channel.FrequencyDownlink = freq
 }
@@ -59,7 +59,7 @@ func (w *Window) OpenWindow(Delay time.Duration, ReceivedDownlink *dl.ReceivedDo
 	}
 }
 
-//MarshalJSON of device's Receive window
+// MarshalJSON of device's Receive window
 func (w *Window) MarshalJSON() ([]byte, error) {
 	type Alias Window
 
@@ -75,7 +75,7 @@ func (w *Window) MarshalJSON() ([]byte, error) {
 
 }
 
-//UnmarshalJSON of device's Receive window
+// UnmarshalJSON of device's Receive window
 func (w *Window) UnmarshalJSON(data []byte) error {
 
 	type Alias Window

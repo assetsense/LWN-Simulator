@@ -15,7 +15,7 @@ import (
 	socketio "github.com/googollee/go-socket.io"
 )
 
-//SimulatorRepository è il repository del simulatore
+// SimulatorRepository è il repository del simulatore
 type SimulatorRepository interface {
 	Run() bool
 	Stop() bool
@@ -43,7 +43,7 @@ type simulatorRepository struct {
 	sim *simulator.Simulator
 }
 
-//NewSimulatorRepository return repository del simulatore
+// NewSimulatorRepository return repository del simulatore
 func NewSimulatorRepository() SimulatorRepository {
 	return &simulatorRepository{}
 }
