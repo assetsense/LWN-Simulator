@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"hash/fnv"
 	"io"
 	"io/ioutil"
 	"log"
@@ -143,22 +144,19 @@ type C2Config struct {
 	MgDeviceId     string `json:"mgDeviceId"`
 }
 
-type BatchMessage struct {
-	MsgType string `json:"msg_type"`
-	Msg     string `json:"msg"`
+type ResponseBatch struct {
+	MsgType        string      `json:"msg_type"`
+	FullImport     bool        `json:"fullImport"`
+	FinalBatch     bool        `json:"finalBatch"`
+	DataSize       int         `json:"dataSize"`
+	Sequence       int         `json:"sequence"`
+	MgDevice       interface{} `json:"mg_device"`
+	BondedDevices  interface{} `json:"bonded_devices"`
+	DeviceProfiles interface{} `json:"deviceProfiles"`
+	Timestamp      int64       `json:"timestamp"`
 }
 
-type BatchData struct {
-	ID           int     `json:"id"`
-	LastSyncTime float64 `json:"lastSyncTime"`
-	Org          int     `json:"org"`
-	CustomerID   int     `json:"customerId"`
-	FullImport   bool    `json:"fullImport"`
-	FinalBatch   bool    `json:"finalBatch"`
-	DataSize     int     `json:"dataSize"`
-	Sequence     int     `json:"sequence"`
-	Data         string  `json:"data"`
-}
+var done = make(chan struct{})
 
 func main() {
 
@@ -167,180 +165,69 @@ func main() {
 	simulatorController.GetIstance()
 
 	log.Println("LWN Simulator is online...")
-	fmt.Println("Press enter to exit!")
+	log.Println("Press enter to exit anytime!")
 
-	//open c2.json file
-	path := "c2.json"
-
-	//c2.json properties can be accessed by config.<property_name>
-	config := C2Config{}
-
-	c2Data, err := ioutil.ReadFile(path)
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
-	}
-
-	err = json.Unmarshal(c2Data, &config)
-	if err != nil {
-		fmt.Println("Error decoding JSON:", err)
-		return
-	}
+	config := OpenC2Json()
 
 	if config.CreateDevices {
 		// AddDevicesToSimulatorREST(simulatorController, config)
 		AddDevicesToSimulatorWS(simulatorController, config)
 	}
 
-	//run the simulator
-	// simulatorController.Run()
+	<-done
+	simulatorController.Run()
 
 	//the main goroutine finishes before other sub goroutines, due to which the program exits before
 	//finishing the sub goroutines, the user input blocks the main go routine to finish
-	var userInput string
-	_, errr := fmt.Scanln(&userInput)
-	if errr != nil {
-		fmt.Println("Simulator Exited", errr)
-		return
-	}
-
-}
-
-func GetDevicesFromC2WS(simulatorController cnt.SimulatorController, config C2Config) {
-
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
-
-	apiURL := config.C2ServerWS
-	username := config.Username
-	password := config.Password
-
-	//creating authentication string
-	authString := fmt.Sprintf("%s:%s", username, password)
-	encodedAuth := base64.StdEncoding.EncodeToString([]byte(authString))
-
-	// Establish WebSocket connection with Basic Authorization header
-	headers := make(http.Header)
-	headers.Set("Authorization", "Basic "+encodedAuth)
-
-	// Establish WebSocket connection
-	c, _, err := websocket.DefaultDialer.Dial(apiURL, headers)
-	if err != nil {
-		log.Fatal("Dial error:", err)
-	}
-	fmt.Println("Connected to WebSocket!")
-
-	// Send the request message
-	message := "{\"msg_type\": \"req_bonded_devices\",\"device\":\"" + "30233a09dab4d76a" + "\", \"ls\": 1705591809117}"
-	err = c.WriteMessage(websocket.TextMessage, []byte(message))
-	if err != nil {
-		log.Fatal("Write error:", err)
-	}
-
-	fmt.Println("Sent message: " + message)
-
-	done := make(chan struct{})
-	dataSize := 0
-	devicesReceived := 0
-
-	// Handle incoming messages from the WebSocket server
-	go func() {
-		defer close(done)
-		for {
-			_, message, err := c.ReadMessage()
-			if err != nil {
-				log.Println("Read error:", err)
-				return
-			}
-			// fmt.Println(string(message))
-			// return
-			var batchMessage BatchMessage
-			err = json.Unmarshal(message, &batchMessage)
-
-			if err != nil {
-				log.Println("Unmarshal error:", err)
-				continue
-			}
-
-			if batchMessage.MsgType == "batch_out" {
-				var batchData BatchData
-				err = json.Unmarshal([]byte(batchMessage.Msg), &batchData)
-				if err != nil {
-					log.Println("Unmarshal batch data error:", err)
-					continue
-				}
-				dataSize = batchData.DataSize
-				jsonData := batchData.Data
-
-				// fmt.Println(jsonData)
-				devicesReceived += AddDevicesToSimulatorWSHelper(simulatorController, config, jsonData)
-				fmt.Println("Number of Devices Received: ", devicesReceived)
-
-				if devicesReceived < dataSize {
-					fmt.Println("All devices are not received yet.")
-				}
-
-				if batchData.FinalBatch {
-					fmt.Println("Final batch received. Stopping reading.")
-					//send close message
-					errr := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-					if errr != nil {
-						log.Println("Write close error:", err)
-					}
-
-					// Finally, close the WebSocket connection
-					c.Close()
-					return
-				}
-			}
-		}
-	}()
-
-	// Wait for the goroutine handling incoming messages to finish
-	// <-done
-
+	BlockMainRoutine()
 }
 
 func AddDevicesToSimulatorWS(simulatorController cnt.SimulatorController, config C2Config) {
 	//fetch all the devices from c2 WS as json string
 	GetDevicesFromC2WS(simulatorController, config)
 
-	// filePath := "batch1final.txt"
+	// fmt.Println(config.MgDeviceId)
+	// filePath := "batch3.txt"
 
-	// // Read the contents of the file
 	// fileContent, err := ioutil.ReadFile(filePath)
 	// if err != nil {
 	// 	log.Fatal("Error reading file:", err)
 	// 	return
 	// }
 
-	// AddDevicesToSimulatorWSHelper(simulatorController, config, string(fileContent))
+	// var responseBatch ResponseBatch
+	// err = json.Unmarshal(fileContent, &responseBatch)
+
+	// if err != nil {
+	// 	log.Println("Unmarshal error of file:", err)
+	// 	return
+	// }
+
+	// AddDevicesToSimulatorWSHelper(simulatorController, config, responseBatch)
 
 }
 
-func AddDevicesToSimulatorWSHelper(simulatorController cnt.SimulatorController, config C2Config, jsonData string) int {
-	devicesReceived := 0
-	var data map[string]interface{}
-	errr := json.Unmarshal([]byte(jsonData), &data)
-	if errr != nil {
-		fmt.Println("Error:", errr)
-		return 0
-	}
-	// Access the "Data" array
-	msgData, _ := data["msg"].(map[string]interface{})
-	devices, ok := msgData["data"].([]interface{})
-	if !ok {
-		fmt.Println("Error: Credentials is invalid | Data array not found in JSON")
-		return 0
-	}
-	//opening the datasamples directory
+func AddDevicesToSimulatorWSHelper(simulatorController cnt.SimulatorController, config C2Config, responseBatch ResponseBatch) int {
 
-	filesS, err := ioutil.ReadDir(config.DataPathS)
+	devicesReceived := 0
+
+	// Unmarshal the JSON data into an interface{}
+	var bondedDevices = responseBatch.BondedDevices
+
+	// Assert the interface{} to a slice of interfaces ([]interface{})
+	devices, ok := bondedDevices.([]interface{})
+	if !ok {
+		fmt.Println("Error: Bonded Devices JSON data is not a slice of interfaces")
+		return 0
+	}
+
+	//opening the datasamples directory
+	filesS, err := os.ReadDir(config.DataPathS)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	filesL, err := ioutil.ReadDir(config.DataPathL)
+	filesL, err := os.ReadDir(config.DataPathL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -361,32 +248,21 @@ func AddDevicesToSimulatorWSHelper(simulatorController cnt.SimulatorController, 
 			continue
 		}
 
-		deviceType, ok := deviceMap["deviceType"].(float64)
-		if !ok {
-			fmt.Println("Error: device type not found")
-			continue
-		}
-
 		// Access specific properties
-		deviceID, _ := deviceMap["id"].(float64)
-		deviceEui, _ := deviceMap["deviceCode"].(string)
-		deviceName, _ := deviceMap["deviceName"].(string)
-		appKey, _ := deviceMap["appKey"].(string)
+		deviceType, _ := deviceMap["type"].(float64)
+		// deviceID, _ := deviceMap["id"].(float64)
+		deviceEui, _ := deviceMap["code"].(string)
+		deviceName, _ := deviceMap["name"].(string)
+		appKey, _ := deviceMap["key"].(string)
+		axisId, _ := deviceMap["axis"].(float64)
+		profileId, _ := deviceMap["profileId"].(float64)
 
-		//this is implemented because there is an issue in the rest service (when the device id doesn't
-		//contain any character then it treats as an integer.
-		var deviceEuiint float64
-		var Euiint = false
-		var deviceEuistring string
-		if deviceEui == "" {
-			Euiint = true
-			deviceEuiint = deviceMap["deviceCode"].(float64)
-		}
-		if Euiint {
-			deviceEuistring = strconv.FormatFloat(deviceEuiint, 'f', -1, 64)
-		} else {
-			deviceEuistring = deviceEui
-		}
+		profileMap := getProfileMap(profileId, responseBatch)
+
+		deviceSupportOTAA := profileMap["deviceSupportOTAA"].(bool)
+		deviceSupportClassB := profileMap["deviceSupportClassB"].(bool)
+		deviceSupportClassC := profileMap["deviceSupportClassC"].(bool)
+		region := getRegionId(profileMap["deviceRegion"].(string))
 
 		var dataPath string
 		var payloadData string
@@ -401,11 +277,6 @@ func AddDevicesToSimulatorWSHelper(simulatorController cnt.SimulatorController, 
 			}
 		} else if deviceType == 6165 {
 			//L-Type
-			axisId, ok := deviceMap["axis"].(float64)
-			if !ok {
-				fmt.Println("Error: device type not found")
-				continue
-			}
 
 			if axisId == 6166 {
 				//x-axis
@@ -428,40 +299,24 @@ func AddDevicesToSimulatorWSHelper(simulatorController cnt.SimulatorController, 
 			}
 
 		} else if deviceType == 6149 {
-			device := PgJson{
-				ID: int(deviceID),
-				PGInfo: PGInfo{
-					MacAddress:  deviceEuistring,
-					KeepAlive:   30,
-					Active:      true,
-					TypeGateway: false,
-					Name:        deviceName,
-					Location: Location{
-						Latitude:  float64(pgLat),
-						Longitude: 0,
-						Altitude:  0,
-					},
-					IP:   "",
-					Port: "",
-				},
-			}
+			pg := getPgJson(deviceEui, deviceName, pgLat)
 
 			// Convert to JSON string
-			jsonData, err := json.MarshalIndent(device, "", "    ")
+			jsonData, err := json.MarshalIndent(pg, "", "    ")
 			if err != nil {
 				fmt.Println("Error:", err)
 				return 0
 			}
 
-			var deviceObj gateway.Gateway
-			errr := json.Unmarshal([]byte(string(jsonData)), &deviceObj)
+			var pgObj gateway.Gateway
+			errr := json.Unmarshal([]byte(string(jsonData)), &pgObj)
 			if errr != nil {
-				fmt.Println("Error:", errr)
+				fmt.Println("Error in pgObj:", errr)
 				return 0
 			}
 
 			// log.Println(deviceName)
-			_, id, _ := simulatorController.AddGateway(&deviceObj)
+			_, id, _ := simulatorController.AddGateway(&pgObj)
 			if id == 0 {
 
 			}
@@ -473,123 +328,31 @@ func AddDevicesToSimulatorWSHelper(simulatorController cnt.SimulatorController, 
 			continue
 		}
 
-		// Open the binary data file
-		file, err := os.Open(dataPath)
-		if err != nil {
-			fmt.Println("Error opening file:", err)
-			return 0
-		}
-		defer file.Close()
-
-		// Read binary data into a buffer
-		buffer := make([]byte, 128)
-		_, err = file.Read(buffer)
-		if err != nil {
-			fmt.Println("Error reading binary data:", err)
-			return 0
-		}
-
 		// Convert binary data to a hexadecimal string
-		payloadData = hex.EncodeToString(buffer)
+		payloadData = ReadDataSample(dataPath)
 
-		// deviceEuistring, err = generateRandomEUI()
 		// Create an instance of DeviceJSON
-		device := DeviceJSON{
-			ID: int(deviceID),
-			Info: Info{
-				Name:    deviceName,
-				DevEUI:  deviceEuistring,
-				AppKey:  appKey,
-				DevAddr: "00000000",
-				NwkSKey: "00000000000000000000000000000000",
-				AppSKey: "00000000000000000000000000000000",
-				Location: Location{
-					Latitude:  float64(devLat),
-					Longitude: 0,
-					Altitude:  0,
-				},
-				Status: Status{
-					MType:   "ConfirmedDataUp",
-					Payload: payloadData,
-					Active:  true,
-					InfoUplink: struct {
-						FPort int `json:"fport"`
-						FCnt  int `json:"fcnt"`
-					}{
-						FPort: 1,
-						FCnt:  1,
-					},
-					FCntDown: 0,
-				},
-				Configuration: Configuration{
-					Region:            1,
-					SendInterval:      config.SendInterval,
-					AckTimeout:        config.AckTimeout,
-					Range:             10000,
-					DisableFCntDown:   true,
-					SupportedOTAA:     true,
-					SupportedADR:      false,
-					SupportedFragment: true,
-					SupportedClassB:   false,
-					SupportedClassC:   false,
-					DataRate:          config.DataRate,
-					RX1DROffset:       0,
-					NbRetransmission:  1,
-				},
-				RXs: []RX{
-					{
-						Delay:        config.RxDelay,
-						DurationOpen: config.RXDurationOpen,
-						Channel: Channel{
-							Active:       false,
-							EnableUplink: false,
-							FreqUplink:   0,
-							FreqDownlink: 0,
-							MinDR:        0,
-							MaxDR:        0,
-						},
-						DataRate: config.DataRate,
-					},
-					{
-						Delay:        config.RxDelay,
-						DurationOpen: config.RXDurationOpen,
-						Channel: Channel{
-							Active:       true,
-							EnableUplink: false,
-							FreqUplink:   0,
-							FreqDownlink: 869525000,
-							MinDR:        0,
-							MaxDR:        0,
-						},
-						DataRate: config.DataRate,
-					},
-				},
-			},
-		}
+		device := getDeviceJson(deviceEui, deviceName, appKey, devLat, payloadData, region, deviceSupportOTAA, deviceSupportClassB, deviceSupportClassC, config)
 
 		// Convert to JSON string
 		jsonData, err := json.MarshalIndent(device, "", "    ")
 		if err != nil {
-			fmt.Println("Error:", err)
+			fmt.Println("Error in marshal device:", err)
 			return 0
 		}
 
 		var deviceObj dev.Device
 		errr := json.Unmarshal([]byte(string(jsonData)), &deviceObj)
 		if errr != nil {
-			fmt.Println("Error:", errr)
+			fmt.Println("Error in unmarshal deviceobj:", errr)
 			return 0
 		}
 
-		// log.Println(deviceName)
 		_, id, err := simulatorController.AddDevice(&deviceObj)
 		if id == 0 {
 
 		}
 		devLat = devLat + 25
-		// if code == 0 || id == 0 {
-		// 	log.Println("device added successfully")
-		// }
 	}
 	return devicesReceived
 }
@@ -914,6 +677,103 @@ func GetDevicesFromC2REST(config C2Config) string {
 	return string(result)
 }
 
+func GetDevicesFromC2WS(simulatorController cnt.SimulatorController, config C2Config) {
+
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+
+	apiURL := config.C2ServerWS
+	username := config.Username
+	password := config.Password
+
+	//creating authentication string
+	authString := fmt.Sprintf("%s:%s", username, password)
+	encodedAuth := base64.StdEncoding.EncodeToString([]byte(authString))
+
+	// Establish WebSocket connection with Basic Authorization header
+	headers := make(http.Header)
+	headers.Set("Authorization", "Basic "+encodedAuth)
+
+	// Establish WebSocket connection
+	c, _, err := websocket.DefaultDialer.Dial(apiURL, headers)
+	if err != nil {
+		log.Fatal("Dial error:", err)
+	}
+
+	// Send the request message
+	message := fmt.Sprintf(`{"msg_type": "req_bonded_devices", "device": "%s", "ls": 0}`, config.MgDeviceId)
+	err = c.WriteMessage(websocket.TextMessage, []byte(message))
+	if err != nil {
+		log.Fatal("Write error:", err)
+	}
+
+	log.Println("Waiting for devices from WS... (Restart if no devices received)")
+
+	dataSize := 0
+	devicesReceived := 0
+	prevSequence := 0
+
+	// Handle incoming messages from the WebSocket server
+	go func() {
+		for {
+			select {
+			case <-done: // Check if we should exit the loop
+				return
+			default:
+				_, message, err := c.ReadMessage()
+				if err != nil {
+					log.Println("Read error:", err)
+					close(done)
+					return
+				}
+				// fmt.Println(string(message))
+				var responseBatch ResponseBatch
+				err = json.Unmarshal(message, &responseBatch)
+				if err != nil {
+					log.Println("Unmarshal error:", err)
+					close(done)
+					continue
+				}
+
+				if responseBatch.MsgType == "resp_bonded_devices" {
+
+					if responseBatch.Sequence != prevSequence+1 {
+						log.Println("Batch ", prevSequence+1, " lost! Please restart.")
+						close(done)
+						return
+					}
+					prevSequence = responseBatch.Sequence
+
+					if dataSize == 0 {
+						dataSize = responseBatch.DataSize
+					}
+
+					// fmt.Println(bondedDevices)
+					devicesReceived += AddDevicesToSimulatorWSHelper(simulatorController, config, responseBatch)
+
+					if responseBatch.FinalBatch {
+						log.Println("Devices received: ", devicesReceived, " | Total: ", dataSize)
+						//send close message
+						errr := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+						if errr != nil {
+							log.Println("Write close error:", err)
+						}
+
+						c.Close()
+						close(done)
+						return
+					}
+				} else {
+					log.Println("Batching message structure is incorrect!")
+					close(done)
+					return
+				}
+			}
+		}
+	}()
+
+}
+
 func GenerateRandomEUI() (string, error) {
 	// Generate a random byte slice of length 8
 	randomBytes := make([]byte, 8)
@@ -929,4 +789,213 @@ func GenerateRandomEUI() (string, error) {
 	eui := hex.EncodeToString(randomBytes)
 
 	return eui, nil
+}
+
+func OpenC2Json() C2Config {
+	//open c2.json file
+	path := "c2.json"
+
+	//c2.json properties can be accessed by config.<property_name>
+	config := C2Config{}
+
+	c2Data, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error opening c2.json file:", err)
+	}
+
+	err = json.Unmarshal(c2Data, &config)
+	if err != nil {
+		fmt.Println("Error decoding c2.json file:", err)
+	}
+
+	return config
+}
+
+func BlockMainRoutine() {
+	var userInput string
+	_, err := fmt.Scanln(&userInput)
+	if err != nil {
+		fmt.Println("Simulator Exited", err)
+		return
+	}
+}
+
+func hashString(s string) int {
+	h := fnv.New32a()
+	h.Write([]byte(s))
+	return int(h.Sum32())
+}
+
+func getPgJson(deviceEui string, deviceName string, pgLat int) PgJson {
+	pg := PgJson{
+		ID: hashString(deviceEui),
+		PGInfo: PGInfo{
+			MacAddress:  deviceEui,
+			KeepAlive:   30,
+			Active:      true,
+			TypeGateway: false,
+			Name:        deviceName,
+			Location: Location{
+				Latitude:  float64(pgLat),
+				Longitude: 0,
+				Altitude:  0,
+			},
+			IP:   "",
+			Port: "",
+		},
+	}
+
+	return pg
+}
+
+func getDeviceJson(deviceEui string, deviceName string, appKey string, devLat int, payloadData string, region int, deviceSupportOTAA bool, deviceSupportClassB bool, deviceSupportClassC bool, config C2Config) DeviceJSON {
+	device := DeviceJSON{
+		ID: hashString(deviceEui),
+		Info: Info{
+			Name:    deviceName,
+			DevEUI:  deviceEui,
+			AppKey:  appKey,
+			DevAddr: "00000000",
+			NwkSKey: "00000000000000000000000000000000",
+			AppSKey: "00000000000000000000000000000000",
+			Location: Location{
+				Latitude:  float64(devLat),
+				Longitude: 0,
+				Altitude:  0,
+			},
+			Status: Status{
+				MType:   "ConfirmedDataUp",
+				Payload: payloadData,
+				Active:  true,
+				InfoUplink: struct {
+					FPort int `json:"fport"`
+					FCnt  int `json:"fcnt"`
+				}{
+					FPort: 1,
+					FCnt:  1,
+				},
+				FCntDown: 0,
+			},
+			Configuration: Configuration{
+				Region:            region,
+				SendInterval:      config.SendInterval,
+				AckTimeout:        config.AckTimeout,
+				Range:             10000,
+				DisableFCntDown:   true,
+				SupportedOTAA:     deviceSupportOTAA,
+				SupportedADR:      false,
+				SupportedFragment: true,
+				SupportedClassB:   deviceSupportClassB,
+				SupportedClassC:   deviceSupportClassC,
+				DataRate:          config.DataRate,
+				RX1DROffset:       0,
+				NbRetransmission:  1,
+			},
+			RXs: []RX{
+				{
+					Delay:        config.RxDelay,
+					DurationOpen: config.RXDurationOpen,
+					Channel: Channel{
+						Active:       false,
+						EnableUplink: false,
+						FreqUplink:   0,
+						FreqDownlink: 0,
+						MinDR:        0,
+						MaxDR:        0,
+					},
+					DataRate: config.DataRate,
+				},
+				{
+					Delay:        config.RxDelay,
+					DurationOpen: config.RXDurationOpen,
+					Channel: Channel{
+						Active:       true,
+						EnableUplink: false,
+						FreqUplink:   0,
+						FreqDownlink: 869525000,
+						MinDR:        0,
+						MaxDR:        0,
+					},
+					DataRate: config.DataRate,
+				},
+			},
+		},
+	}
+	return device
+}
+
+func ReadDataSample(path string) string {
+	// Open the binary data file
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return ""
+	}
+	defer file.Close()
+
+	// Read binary data into a buffer
+	buffer := make([]byte, 128)
+	_, err = file.Read(buffer)
+	if err != nil {
+		fmt.Println("Error reading binary data:", err)
+		return ""
+	}
+	return hex.EncodeToString(buffer)
+}
+
+func getProfileMap(profileId float64, responseBatch ResponseBatch) map[string]interface{} {
+
+	var deviceProfiles = responseBatch.DeviceProfiles
+	var returnProfile map[string]interface{}
+	// Assert the interface{} to a slice of interfaces ([]interface{})
+	profiles, ok := deviceProfiles.([]interface{})
+	if !ok {
+		fmt.Println("Error: Device Proifles JSON data is not a slice of interfaces")
+		return returnProfile
+	}
+
+	for _, profile := range profiles {
+		ProfileMap, _ := profile.(map[string]interface{})
+		returnProfile = ProfileMap
+
+		id, _ := ProfileMap["id"].(float64)
+		if id == profileId {
+			return ProfileMap
+		}
+	}
+	return returnProfile
+}
+
+func getRegionId(region string) int {
+	if region == "EU868" {
+		return 1
+	}
+	if region == "US915" {
+		return 2
+	}
+	if region == "CN779" {
+		return 3
+	}
+	if region == "EU433" {
+		return 4
+	}
+	if region == "AU915" {
+		return 5
+	}
+	if region == "CN470" {
+		return 6
+	}
+	if region == "AS923" {
+		return 7
+	}
+	if region == "KR920" {
+		return 8
+	}
+	if region == "IN865" {
+		return 9
+	}
+	if region == "RU864" {
+		return 10
+	}
+	return 1
 }

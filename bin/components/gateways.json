@@ -1,19 +1,852 @@
 {
-				"0": {
-					"id": 0,
-					"info": {
-						"macAddress": "c8fd50b13d204e38",
-						"keepAlive": 30,
-						"active": true,
-						"typeGateway": false,
-						"name": "test-gw",
-						"location": {
-							"latitude": 0,
-							"longitude": 0,
-							"altitude": 0
-						},
-						"ip": "",
-						"port": ""
-					}
-				}
-			}
+	"1050861174": {
+		"id": 1050861174,
+		"info": {
+			"macAddress": "3deaefa3524ccf6d",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-47",
+			"location": {
+				"latitude": 20500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"120817232": {
+		"id": 120817232,
+		"info": {
+			"macAddress": "75f1bbd370c7c294",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-26",
+			"location": {
+				"latitude": 7500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"1252230552": {
+		"id": 1252230552,
+		"info": {
+			"macAddress": "e016be04b5f8fcc3",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-31",
+			"location": {
+				"latitude": 12500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"135145921": {
+		"id": 135145921,
+		"info": {
+			"macAddress": "c37d9fc43528c677",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-49",
+			"location": {
+				"latitude": 22500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"1506498453": {
+		"id": 1506498453,
+		"info": {
+			"macAddress": "21b35e07e0c2609b",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-23",
+			"location": {
+				"latitude": 4500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"1829220802": {
+		"id": 1829220802,
+		"info": {
+			"macAddress": "b962b5f9d7d3a500",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-40",
+			"location": {
+				"latitude": 21500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"1998431092": {
+		"id": 1998431092,
+		"info": {
+			"macAddress": "8424f9150237d9b3",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-42",
+			"location": {
+				"latitude": 23500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2124815473": {
+		"id": 2124815473,
+		"info": {
+			"macAddress": "ffcf3b389dca022b",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-35",
+			"location": {
+				"latitude": 16500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"219893624": {
+		"id": 219893624,
+		"info": {
+			"macAddress": "3002cb5e5dd36568",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-28",
+			"location": {
+				"latitude": 9500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2203011394": {
+		"id": 2203011394,
+		"info": {
+			"macAddress": "b65372139a93e25b",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-45",
+			"location": {
+				"latitude": 18500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2264287717": {
+		"id": 2264287717,
+		"info": {
+			"macAddress": "b7c2728a2adf95d3",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-9",
+			"location": {
+				"latitude": 8500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2278365892": {
+		"id": 2278365892,
+		"info": {
+			"macAddress": "fd1af27c916a61ed",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-37",
+			"location": {
+				"latitude": 18500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2285408276": {
+		"id": 2285408276,
+		"info": {
+			"macAddress": "4fa76298d27cb589",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-44",
+			"location": {
+				"latitude": 25500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2419088291": {
+		"id": 2419088291,
+		"info": {
+			"macAddress": "9e2389686bfe8efb",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-8",
+			"location": {
+				"latitude": 7500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"248569286": {
+		"id": 248569286,
+		"info": {
+			"macAddress": "7ed6082c9811832f",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-20",
+			"location": {
+				"latitude": 1500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"250656979": {
+		"id": 250656979,
+		"info": {
+			"macAddress": "bbb1424f6f8c6b6d",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-46",
+			"location": {
+				"latitude": 19500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2512524133": {
+		"id": 2512524133,
+		"info": {
+			"macAddress": "5d873bbd6d12d7a2",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-29",
+			"location": {
+				"latitude": 10500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2525333375": {
+		"id": 2525333375,
+		"info": {
+			"macAddress": "6c1b0b1223138a70",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-33",
+			"location": {
+				"latitude": 14500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2526648229": {
+		"id": 2526648229,
+		"info": {
+			"macAddress": "3df0964a86c1c87e",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-39",
+			"location": {
+				"latitude": 20500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2542002838": {
+		"id": 2542002838,
+		"info": {
+			"macAddress": "426f48849a554461",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-34",
+			"location": {
+				"latitude": 15500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"255723028": {
+		"id": 255723028,
+		"info": {
+			"macAddress": "ecd18e51b7fd20b2",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-48",
+			"location": {
+				"latitude": 21500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2675577885": {
+		"id": 2675577885,
+		"info": {
+			"macAddress": "116b1fdf04889a21",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-11",
+			"location": {
+				"latitude": 10500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2820523279": {
+		"id": 2820523279,
+		"info": {
+			"macAddress": "bd079093da350272",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-36",
+			"location": {
+				"latitude": 17500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2911132866": {
+		"id": 2911132866,
+		"info": {
+			"macAddress": "bc38468145518683",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-32",
+			"location": {
+				"latitude": 13500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"2935471318": {
+		"id": 2935471318,
+		"info": {
+			"macAddress": "eef8a1bb1df632e8",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-1",
+			"location": {
+				"latitude": 500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3079171251": {
+		"id": 3079171251,
+		"info": {
+			"macAddress": "1d5c07c2387ef8ee",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-25",
+			"location": {
+				"latitude": 6500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3198004624": {
+		"id": 3198004624,
+		"info": {
+			"macAddress": "afc8f10c9c154c5a",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-50",
+			"location": {
+				"latitude": 23500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3223605128": {
+		"id": 3223605128,
+		"info": {
+			"macAddress": "fc3dbf661a5a07ca",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-16",
+			"location": {
+				"latitude": 15500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3246489842": {
+		"id": 3246489842,
+		"info": {
+			"macAddress": "f262f5d5945fad82",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-6",
+			"location": {
+				"latitude": 5500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3255090208": {
+		"id": 3255090208,
+		"info": {
+			"macAddress": "aefe685c4c767302",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-2",
+			"location": {
+				"latitude": 1500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3293989923": {
+		"id": 3293989923,
+		"info": {
+			"macAddress": "6929320a2401f81f",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-4",
+			"location": {
+				"latitude": 3500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3401112736": {
+		"id": 3401112736,
+		"info": {
+			"macAddress": "6b930b32163ccdca",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-41",
+			"location": {
+				"latitude": 22500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3493570894": {
+		"id": 3493570894,
+		"info": {
+			"macAddress": "ee38e1705914c600",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-7",
+			"location": {
+				"latitude": 6500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3634425313": {
+		"id": 3634425313,
+		"info": {
+			"macAddress": "26d2e9169e005307",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-18",
+			"location": {
+				"latitude": 17500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3729150290": {
+		"id": 3729150290,
+		"info": {
+			"macAddress": "7e04379252ede818",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-15",
+			"location": {
+				"latitude": 14500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3805710978": {
+		"id": 3805710978,
+		"info": {
+			"macAddress": "33c3676d8b0c4c6f",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-3",
+			"location": {
+				"latitude": 2500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3853653843": {
+		"id": 3853653843,
+		"info": {
+			"macAddress": "638e53ab2efbfa0c",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-17",
+			"location": {
+				"latitude": 16500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"3933833626": {
+		"id": 3933833626,
+		"info": {
+			"macAddress": "c5840e1ad7bfe600",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-22",
+			"location": {
+				"latitude": 3500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"4003789218": {
+		"id": 4003789218,
+		"info": {
+			"macAddress": "1c54095772904e73",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-43",
+			"location": {
+				"latitude": 24500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"4033643462": {
+		"id": 4033643462,
+		"info": {
+			"macAddress": "f8d64249436fb05d",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-30",
+			"location": {
+				"latitude": 11500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"4075241011": {
+		"id": 4075241011,
+		"info": {
+			"macAddress": "4ef1db27dd934766",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-21",
+			"location": {
+				"latitude": 2500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"4130777280": {
+		"id": 4130777280,
+		"info": {
+			"macAddress": "b6f98158e5d5cb60",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-24",
+			"location": {
+				"latitude": 5500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"4247559549": {
+		"id": 4247559549,
+		"info": {
+			"macAddress": "4441bcd73412f584",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-14",
+			"location": {
+				"latitude": 13500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"4285825028": {
+		"id": 4285825028,
+		"info": {
+			"macAddress": "280208a92fd99bc8",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-5",
+			"location": {
+				"latitude": 4500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"4290359195": {
+		"id": 4290359195,
+		"info": {
+			"macAddress": "4d338a469f4eb218",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-27",
+			"location": {
+				"latitude": 8500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"500785493": {
+		"id": 500785493,
+		"info": {
+			"macAddress": "12b1241323660481",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-10",
+			"location": {
+				"latitude": 9500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"597917183": {
+		"id": 597917183,
+		"info": {
+			"macAddress": "57e7eec35a230a35",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-13",
+			"location": {
+				"latitude": 12500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"779322496": {
+		"id": 779322496,
+		"info": {
+			"macAddress": "608206bf59ef68fb",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-19",
+			"location": {
+				"latitude": 500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"796706596": {
+		"id": 796706596,
+		"info": {
+			"macAddress": "4994ad595905083b",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-38",
+			"location": {
+				"latitude": 19500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	},
+	"901334803": {
+		"id": 901334803,
+		"info": {
+			"macAddress": "64bee5d02bfb899c",
+			"keepAlive": 30,
+			"active": true,
+			"typeGateway": false,
+			"name": "PG-QA86-12",
+			"location": {
+				"latitude": 11500,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"ip": "",
+			"port": ""
+		}
+	}
+}

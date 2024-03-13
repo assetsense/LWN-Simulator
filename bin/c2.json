@@ -1,16 +1,18 @@
 {
-    "c2server" : "https://qa65.assetsense.com/c2/services/deviceservice/getdevices",
-    "username" : "harsha.iotqa5",
+    "c2serverREST" : "https://qa65.assetsense.com/c2/services/deviceservice/getdevices",
+    "c2serverWS": "wss://qa65.assetsense.com/ws/",
+    "username" : "sooraj.iotqa86",
     "password" : "HydeVil#71",
     "createDevices": true,
-    "joinDelay": 5,
+    "joinDelay": 4,
     "dataPathS": "datasamples/stype_sample/",
     "dataPathL": "datasamples/ltype_sample/",
-    "sendInterval": 60,
-    "ackTimeout": 30,
-    "rxDelay": 0,
-    "rxDurationOpen": 30000,
+    "sendInterval": 10,
+    "ackTimeout": 4,
+    "rxDelay": 1000,
+    "rxDurationOpen": 3000,
     "dataRate": 0,
-    "configDirname":"components"
+    "configDirname":"components",
+    "mgDeviceId": "30233a09dab4d76a"
 
 }
