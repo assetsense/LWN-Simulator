@@ -13,7 +13,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/signal"
 	"strconv"
 
 	"github.com/gorilla/websocket"
@@ -156,8 +155,6 @@ type ResponseBatch struct {
 	Timestamp      int64       `json:"timestamp"`
 }
 
-var done = make(chan struct{})
-
 func main() {
 
 	simulatorRepository := repo.NewSimulatorRepository()
@@ -174,7 +171,7 @@ func main() {
 		AddDevicesToSimulatorWS(simulatorController, config)
 	}
 
-	<-done
+	// <-done
 	simulatorController.Run()
 
 	//the main goroutine finishes before other sub goroutines, due to which the program exits before
@@ -679,8 +676,8 @@ func GetDevicesFromC2REST(config C2Config) string {
 
 func GetDevicesFromC2WS(simulatorController cnt.SimulatorController, config C2Config) {
 
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
+	// interrupt := make(chan os.Signal, 1)
+	// signal.Notify(interrupt, os.Interrupt)
 
 	apiURL := config.C2ServerWS
 	username := config.Username
@@ -714,63 +711,51 @@ func GetDevicesFromC2WS(simulatorController cnt.SimulatorController, config C2Co
 	prevSequence := 0
 
 	// Handle incoming messages from the WebSocket server
-	go func() {
-		for {
-			select {
-			case <-done: // Check if we should exit the loop
-				return
-			default:
-				_, message, err := c.ReadMessage()
-				if err != nil {
-					log.Println("Read error:", err)
-					close(done)
-					return
-				}
-				// fmt.Println(string(message))
-				var responseBatch ResponseBatch
-				err = json.Unmarshal(message, &responseBatch)
-				if err != nil {
-					log.Println("Unmarshal error:", err)
-					close(done)
-					continue
-				}
-
-				if responseBatch.MsgType == "resp_bonded_devices" {
-
-					if responseBatch.Sequence != prevSequence+1 {
-						log.Println("Batch ", prevSequence+1, " lost! Please restart.")
-						close(done)
-						return
-					}
-					prevSequence = responseBatch.Sequence
-
-					if dataSize == 0 {
-						dataSize = responseBatch.DataSize
-					}
-
-					// fmt.Println(bondedDevices)
-					devicesReceived += AddDevicesToSimulatorWSHelper(simulatorController, config, responseBatch)
-
-					if responseBatch.FinalBatch {
-						log.Println("Devices received: ", devicesReceived, " | Total: ", dataSize)
-						//send close message
-						errr := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-						if errr != nil {
-							log.Println("Write close error:", err)
-						}
-
-						c.Close()
-						close(done)
-						return
-					}
-				} else {
-					log.Println("Batching message structure is incorrect!")
-					close(done)
-					return
-				}
-			}
+	for {
+		_, message, err := c.ReadMessage()
+		if err != nil {
+			log.Println("Read error:", err)
+			return
 		}
-	}()
+		// fmt.Println(string(message))
+		var responseBatch ResponseBatch
+		err = json.Unmarshal(message, &responseBatch)
+		if err != nil {
+			log.Println("Unmarshal error:", err)
+			continue
+		}
+
+		if responseBatch.MsgType == "resp_bonded_devices" {
+
+			if responseBatch.Sequence != prevSequence+1 {
+				log.Println("Batch ", prevSequence+1, " lost! Please restart.")
+				return
+			}
+			prevSequence = responseBatch.Sequence
+
+			if dataSize == 0 {
+				dataSize = responseBatch.DataSize
+			}
+
+			// fmt.Println(bondedDevices)
+			devicesReceived += AddDevicesToSimulatorWSHelper(simulatorController, config, responseBatch)
+
+			if responseBatch.FinalBatch {
+				log.Println("Devices received: ", devicesReceived, " | Total: ", dataSize)
+				//send close message
+				errr := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+				if errr != nil {
+					log.Println("Write close error:", err)
+				}
+
+				c.Close()
+				return
+			}
+		} else {
+			log.Println("Batching message structure is incorrect!")
+			return
+		}
+	}
 
 }
 
