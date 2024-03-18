@@ -155,6 +155,9 @@ type ResponseBatch struct {
 	Timestamp      int64       `json:"timestamp"`
 }
 
+var devLat = 0
+var pgLat = 500
+
 func main() {
 
 	simulatorRepository := repo.NewSimulatorRepository()
@@ -234,8 +237,6 @@ func AddDevicesToSimulatorWSHelper(simulatorController cnt.SimulatorController, 
 	iS := 0
 	iL := 0
 
-	devLat := 0
-	pgLat := 500
 	// Iterate over devices
 	for _, device := range devices {
 		devicesReceived += 1
@@ -745,7 +746,7 @@ func GetDevicesFromC2WS(simulatorController cnt.SimulatorController, config C2Co
 				//send close message
 				errr := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 				if errr != nil {
-					log.Println("Write close error:", err)
+					log.Println("Write close error:", errr)
 				}
 
 				c.Close()
