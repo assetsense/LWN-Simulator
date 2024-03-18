@@ -9,11 +9,23 @@ const { Device, DeviceKeys } = require("@chirpstack/chirpstack-api/api/device_pb
 
 // This must point to the ChirpStack API interface.
 const server = "localhost:8080";
+const appId = "681f2673-e33b-4cb0-8acd-cb915b2a45ec";
+const profileId = "e02422c6-f46d-42c1-8c63-756fda1d3c62";
+const apiToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjYwOGNjMWZkLWRkMjgtNDEzMy1iOTVkLWJjODNkY2I4ZjA3MSIsInR5cCI6ImtleSJ9.IkOwMfjAwyKeM5r1w2gwicOVRqVTmc-l6na5fORjx54";
+const tenantId = "cfef8a30-c202-456d-9b7d-b948a515fcb3"
 
 var devices = {};
 
+main()
+
+async function main() {
+    await getDevicesFromC2();
+    await addingDevice(server, apiToken, devices, appId, profileId);
+    console.log("All Devices are PGs are added!")
+}
+
 async function getDevicesFromC2() {
-    const apiUrl = c2.c2server;
+    const apiUrl = c2.c2serverREST;
     const username = c2.username;
     const password = c2.password;
     const postData = "{}";
@@ -41,15 +53,6 @@ async function getDevicesFromC2() {
         });
 }
 
-async function main() {
-    await getDevicesFromC2();
-    const appId = "1acc6671-7104-427a-8a8e-eeb09b08f034";
-    const profileId = "e02422c6-f46d-42c1-8c63-756fda1d3c62";
-    const apiToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjYwOGNjMWZkLWRkMjgtNDEzMy1iOTVkLWJjODNkY2I4ZjA3MSIsInR5cCI6ImtleSJ9.IkOwMfjAwyKeM5r1w2gwicOVRqVTmc-l6na5fORjx54";
-    await addingDevice(server, apiToken, devices, appId, profileId);
-}
-main()
-
 async function addingDevice(server, apiToken, deviceList, applicationId, deviceProfileId) {
 
     //check if device is not an array
@@ -73,7 +76,7 @@ async function addingDevice(server, apiToken, deviceList, applicationId, deviceP
                 gateway.setGatewayId(dev.deviceCode + "");
                 gateway.setName(dev.deviceName);
                 gateway.setStatsInterval(30);
-                gateway.setTenantId("cfef8a30-c202-456d-9b7d-b948a515fcb3")
+                gateway.setTenantId(tenantId)
                 req.setGateway(gateway)
 
                 //adding the device and the device key
@@ -83,13 +86,14 @@ async function addingDevice(server, apiToken, deviceList, applicationId, deviceP
                 await channel.create(req, metadata, async (err,res) => {
                     console.log(dev.deviceName);
                     if (err !== null) {
-                        console.log(err)
-                        // console.log("Invalid ID or Gateway Already Used!");
+                        // console.error(err)
+                        console.log("Invalid ID or Gateway Already Used!");
                         return;
                     } else {
                         console.log("Gateway added successfully!");
                     }
                 });
+                continue
             }
             
 
@@ -104,7 +108,6 @@ async function addingDevice(server, apiToken, deviceList, applicationId, deviceP
             // device.setDescription("Registering device via API");
             device.setIsDisabled(false);
             device.setSkipFcntCheck(true);
-            device.setIsDisabled(false);
             req.setDevice(device);
 
             //setting up the device key

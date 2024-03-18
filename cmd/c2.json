@@ -1,10 +1,9 @@
 {
     "c2serverREST" : "https://qa65.assetsense.com/c2/services/deviceservice/getdevices",
     "c2serverWS": "wss://qa65.assetsense.com/ws/",
-    "username" : "goutham.as",
+    "username" : "sooraj.iotqa86",
     "password" : "HydeVil#71",
-    "createDevices": true,
-    "joinDelay": 4,
+    "joinDelay": 0,
     "dataPathS": "datasamples/stype_sample/",
     "dataPathL": "datasamples/ltype_sample/",
     "sendInterval": 10,
@@ -13,6 +12,12 @@
     "rxDurationOpen": 3000,
     "dataRate": 0,
     "configDirname":"components",
-    "mgDeviceId": "30233a09dab4d76a"
-
+    "mgDeviceId": "30233a09dab4d76a",
+    "createDevicesLWN": false,
+    "createDevicesChirpstack": false,
+    "chirpstackServer": "localhost:8080",
+    "apiToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjZjYWZhMWFlLTM0NmMtNGYwNC1hMTAzLTRhY2Y3NmEwZDhmYyIsInR5cCI6ImtleSJ9.C6IRV-1VRv2qYV9ThmbEHlPvfPzHw4IJQDR5HU6jOsc",
+    "applicationId": "d752e719-e3c9-4156-801f-bb55af591c3d",
+    "profileId": "703c7d4d-eb17-482a-93c6-b0069fd92557",
+    "tenantId": "52f14cd4-c6f1-4fbd-8f87-4025e1d49242"
 }

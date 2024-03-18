@@ -53,7 +53,7 @@ func inRange(d m.InfoDevice, g m.InfoGateway) bool {
 	distance := loc.GetDistance(d.Location.Latitude, d.Location.Longitude,
 		g.Location.Latitude, g.Location.Longitude)
 
-	if distance <= (d.Range / 1000.0) {
+	if distance <= (d.Range / 20.0) {
 		return true
 	}
 

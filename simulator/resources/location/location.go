@@ -2,9 +2,9 @@ package location
 
 import "math"
 
-const RADIUS = float64(6378.16)
+// const RADIUS = float64(6378.16)
 
-//Location is a position of device
+// Location is a position of device
 type Location struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
@@ -17,11 +17,13 @@ func Radians(x float64) float64 {
 
 func GetDistance(lat1 float64, lon1 float64, lat2 float64, lon2 float64) float64 {
 
-	dlon := Radians(lon2 - lon1)
-	dlat := Radians(lat2 - lat1)
+	// dlon := Radians(lon2 - lon1)
+	// dlat := Radians(lat2 - lat1)
 
-	a := (math.Sin(dlat/2) * math.Sin(dlat/2)) + math.Cos(Radians(lat1))*math.Cos(Radians(lat2))*(math.Sin(dlon/2)*math.Sin(dlon/2))
-	angle := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+	// a := (math.Sin(dlat/2) * math.Sin(dlat/2)) + math.Cos(Radians(lat1))*math.Cos(Radians(lat2))*(math.Sin(dlon/2)*math.Sin(dlon/2))
+	// angle := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+	distance := math.Sqrt((lat1-lat2)*(lat1-lat2) + (lon1-lon2)*(lon1-lon2))
 
-	return angle * RADIUS
+	// return angle * RADIUS
+	return distance
 }

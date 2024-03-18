@@ -25,7 +25,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-26",
 			"location": {
-				"latitude": 7500,
+				"latitude": 31500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -42,7 +42,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-31",
 			"location": {
-				"latitude": 12500,
+				"latitude": 36500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -76,7 +76,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-23",
 			"location": {
-				"latitude": 4500,
+				"latitude": 28500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -93,7 +93,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-40",
 			"location": {
-				"latitude": 21500,
+				"latitude": 45500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -110,7 +110,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-42",
 			"location": {
-				"latitude": 23500,
+				"latitude": 47500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -127,7 +127,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-35",
 			"location": {
-				"latitude": 16500,
+				"latitude": 40500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -144,7 +144,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-28",
 			"location": {
-				"latitude": 9500,
+				"latitude": 33500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -195,7 +195,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-37",
 			"location": {
-				"latitude": 18500,
+				"latitude": 42500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -212,7 +212,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-44",
 			"location": {
-				"latitude": 25500,
+				"latitude": 49500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -246,7 +246,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-20",
 			"location": {
-				"latitude": 1500,
+				"latitude": 25500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -280,7 +280,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-29",
 			"location": {
-				"latitude": 10500,
+				"latitude": 34500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -297,7 +297,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-33",
 			"location": {
-				"latitude": 14500,
+				"latitude": 38500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -314,7 +314,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-39",
 			"location": {
-				"latitude": 20500,
+				"latitude": 44500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -331,7 +331,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-34",
 			"location": {
-				"latitude": 15500,
+				"latitude": 39500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -382,7 +382,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-36",
 			"location": {
-				"latitude": 17500,
+				"latitude": 41500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -399,7 +399,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-32",
 			"location": {
-				"latitude": 13500,
+				"latitude": 37500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -433,7 +433,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-25",
 			"location": {
-				"latitude": 6500,
+				"latitude": 30500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -535,7 +535,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-41",
 			"location": {
-				"latitude": 22500,
+				"latitude": 46500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -637,7 +637,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-22",
 			"location": {
-				"latitude": 3500,
+				"latitude": 27500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -654,7 +654,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-43",
 			"location": {
-				"latitude": 24500,
+				"latitude": 48500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -671,7 +671,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-30",
 			"location": {
-				"latitude": 11500,
+				"latitude": 35500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -688,7 +688,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-21",
 			"location": {
-				"latitude": 2500,
+				"latitude": 26500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -705,7 +705,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-24",
 			"location": {
-				"latitude": 5500,
+				"latitude": 29500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -756,7 +756,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-27",
 			"location": {
-				"latitude": 8500,
+				"latitude": 32500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -807,7 +807,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-19",
 			"location": {
-				"latitude": 500,
+				"latitude": 24500,
 				"longitude": 0,
 				"altitude": 0
 			},
@@ -824,7 +824,7 @@
 			"typeGateway": false,
 			"name": "PG-QA86-38",
 			"location": {
-				"latitude": 19500,
+				"latitude": 43500,
 				"longitude": 0,
 				"altitude": 0
 			},
