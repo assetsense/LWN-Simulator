@@ -12,16 +12,19 @@ import (
 )
 
 type InformationDevice struct {
-	Name      string            `json:"name"`
-	DevEUI    lorawan.EUI64     `json:"devEUI"`
-	DevAddr   lorawan.DevAddr   `json:"devAddr"`
-	NwkSKey   [16]byte          `json:"nwkSKey"`
-	AppSKey   [16]byte          `json:"appSKey"`
-	AppKey    [16]byte          `json:"appKey"`
-	DevNonce  lorawan.DevNonce  `json:"-"`
-	JoinNonce lorawan.JoinNonce `json:"-"`
-	NetID     lorawan.NetID     `json:"-"`
-	JoinEUI   lorawan.EUI64     `json:"-"`
+	Name       string            `json:"name"`
+	DeviceType int               `json:"deviceType"`
+	DataType   int               `json:"dataType"`
+	AxisId     int               `json:"axisId"`
+	DevEUI     lorawan.EUI64     `json:"devEUI"`
+	DevAddr    lorawan.DevAddr   `json:"devAddr"`
+	NwkSKey    [16]byte          `json:"nwkSKey"`
+	AppSKey    [16]byte          `json:"appSKey"`
+	AppKey     [16]byte          `json:"appKey"`
+	DevNonce   lorawan.DevNonce  `json:"-"`
+	JoinNonce  lorawan.JoinNonce `json:"-"`
+	NetID      lorawan.NetID     `json:"-"`
+	JoinEUI    lorawan.EUI64     `json:"-"`
 
 	Status        Status        `json:"status"`
 	Configuration Configuration `json:"configuration"`

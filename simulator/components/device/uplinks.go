@@ -63,9 +63,9 @@ func (d *Device) CreateUplink() [][]byte {
 	if d.Info.Configuration.SupportedFragment { //frammentazione
 
 		if len(d.Info.Status.DataUplink.FOpts) > 0 {
-			DataPayload = up.Fragmentation(n, payload)
+			DataPayload = up.Fragmentation(d.Info.DeviceType, d.Info.DataType, d.Info.AxisId, n, payload)
 		} else {
-			DataPayload = up.Fragmentation(m, payload)
+			DataPayload = up.Fragmentation(d.Info.DeviceType, d.Info.DataType, d.Info.AxisId, m, payload)
 		}
 
 	} else { //troncamento

@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/gorilla/websocket"
 
@@ -65,6 +64,9 @@ type PGInfo struct {
 // Info represents the "info" part of the structure
 type Info struct {
 	Name          string        `json:"name"`
+	DeviceType    int           `json:"deviceType"`
+	DataType      int           `json:"dataType"`
+	AxisId        int           `json:"axisId"`
 	DevEUI        string        `json:"devEUI"`
 	AppKey        string        `json:"appKey"`
 	DevAddr       string        `json:"devAddr"`
@@ -146,6 +148,7 @@ type C2Config struct {
 	DataRate                int    `json:"dataRate"`
 	ConfigDirName           string `json:"configDirname"`
 	MgDeviceId              string `json:"mgDeviceId"`
+	MgPasscode              string `json:"mgPasscode"`
 	CreateDevicesChirpstack bool   `json:"createDevicesChirpstack"`
 	ChirpstackServer        string `json:"chirpstackServer"`
 	ApiToken                string `json:"apiToken"`
@@ -181,8 +184,8 @@ func main() {
 	config := OpenC2Json()
 
 	if config.CreateDevicesLWN {
-		AddDevicesToSimulatorREST(simulatorController, config)
-		// AddDevicesToSimulatorWS(simulatorController, config)
+		// AddDevicesToSimulatorREST(simulatorController, config)
+		AddDevicesToSimulatorWS(simulatorController, config)
 	}
 
 	if config.CreateDevicesChirpstack {
@@ -204,17 +207,18 @@ func AddDevicesToChirpstackWS(simulatorController cnt.SimulatorController, confi
 }
 
 func GetDevicesFromC2WSChirpstack(simulatorController cnt.SimulatorController, config C2Config) {
-	apiURL := config.C2ServerWS
-	username := config.Username
-	password := config.Password
+	mgDeviceId := config.MgDeviceId
+	mgPasscode := config.MgPasscode
 
 	//creating authentication string
-	authString := fmt.Sprintf("%s:%s", username, password)
+	authString := fmt.Sprintf("%s:%s", mgDeviceId, mgPasscode)
 	encodedAuth := base64.StdEncoding.EncodeToString([]byte(authString))
+
+	apiURL := config.C2ServerWS + encodedAuth + "/true"
 
 	// Establish WebSocket connection with Basic Authorization header
 	headers := make(http.Header)
-	headers.Set("Authorization", "Basic "+encodedAuth)
+	headers.Set("Device", "Basic "+encodedAuth)
 
 	// Establish WebSocket connection
 	c, _, err := websocket.DefaultDialer.Dial(apiURL, headers)
@@ -238,6 +242,7 @@ func GetDevicesFromC2WSChirpstack(simulatorController cnt.SimulatorController, c
 	// Handle incoming messages from the WebSocket server
 	for {
 		_, message, err := c.ReadMessage()
+		// fmt.Println(message)
 		if err != nil {
 			log.Println("Read error:", err)
 			return
@@ -328,6 +333,7 @@ func AddDevicesToSimulatorWSHelperChirpstack(simulatorController cnt.SimulatorCo
 		grpc.WithBlock(),
 		grpc.WithPerRPCCredentials(APIToken(config.ApiToken)),
 		grpc.WithInsecure(), // remove this when using TLS
+		grpc.WithTimeout(5),
 	}
 
 	// connect to the gRPC server
@@ -440,6 +446,7 @@ func AddDevicesToSimulatorWSHelper(simulatorController cnt.SimulatorController, 
 
 		// Access specific properties
 		deviceType, _ := deviceMap["type"].(float64)
+		dataType, _ := deviceMap["data_type"].(float64)
 		// deviceID, _ := deviceMap["id"].(float64)
 		deviceEui, _ := deviceMap["code"].(string)
 		deviceName, _ := deviceMap["name"].(string)
@@ -485,10 +492,11 @@ func AddDevicesToSimulatorWSHelper(simulatorController cnt.SimulatorController, 
 		}
 
 		// Convert binary data to a hexadecimal string
-		payloadData := ReadDataSample(int(deviceType), int(axisId), config)
+		// payloadData := ReadDataSample(int(dataType), int(deviceType), int(axisId), config)
+		payloadData := ""
 
 		// Create an instance of DeviceJSON
-		device := getDeviceJson(deviceEui, deviceName, appKey, devLat, payloadData, region, deviceSupportOTAA, deviceSupportClassB, deviceSupportClassC, config)
+		device := getDeviceJson(int(deviceType), int(dataType), int(axisId), deviceEui, deviceName, appKey, devLat, payloadData, region, deviceSupportOTAA, deviceSupportClassB, deviceSupportClassC, config)
 
 		// Convert to JSON string
 		jsonData, err := json.MarshalIndent(device, "", "    ")
@@ -556,8 +564,8 @@ func AddDevicesToSimulatorREST(simulatorController cnt.SimulatorController, conf
 		deviceName, _ := deviceMap["deviceName"].(string)
 		appKey, _ := deviceMap["applicationKey"].(string)
 		// gatewayId, _ := deviceMap["gatewayId"].(float64)
-		axis, ok := deviceMap["axis"].(map[string]interface{})
-		axisId, _ := axis["id"].(float64)
+		// axis, ok := deviceMap["axis"].(map[string]interface{})
+		// axisId, _ := axis["id"].(float64)
 
 		//this is implemented because there is an issue in the rest service (when the device id doesn't
 		//contain any character then it treats as an integer.
@@ -619,7 +627,8 @@ func AddDevicesToSimulatorREST(simulatorController cnt.SimulatorController, conf
 			continue
 		}
 
-		payloadData := ReadDataSample(int(deviceId), int(axisId), config)
+		// payloadData := ReadDataSample(0, int(deviceId), int(axisId), config)
+		payloadData := ""
 
 		// deviceEuistring, err = generateRandomEUI()
 		// Create an instance of DeviceJSON
@@ -638,7 +647,7 @@ func AddDevicesToSimulatorREST(simulatorController cnt.SimulatorController, conf
 					Altitude:  0,
 				},
 				Status: Status{
-					MType:   "ConfirmedDataUp",
+					MType:   "UnconfirmedDataUp",
 					Payload: payloadData,
 					Active:  true,
 					InfoUplink: struct {
@@ -767,17 +776,18 @@ func GetDevicesFromC2WS(simulatorController cnt.SimulatorController, config C2Co
 	// interrupt := make(chan os.Signal, 1)
 	// signal.Notify(interrupt, os.Interrupt)
 
-	apiURL := config.C2ServerWS
-	username := config.Username
-	password := config.Password
+	mgDeviceId := config.MgDeviceId
+	mgPasscode := config.MgPasscode
 
 	//creating authentication string
-	authString := fmt.Sprintf("%s:%s", username, password)
+	authString := fmt.Sprintf("%s:%s", mgDeviceId, mgPasscode)
 	encodedAuth := base64.StdEncoding.EncodeToString([]byte(authString))
+
+	apiURL := config.C2ServerWS + encodedAuth + "/true"
 
 	// Establish WebSocket connection with Basic Authorization header
 	headers := make(http.Header)
-	headers.Set("Authorization", "Basic "+encodedAuth)
+	headers.Set("Device", "Basic "+encodedAuth)
 
 	// Establish WebSocket connection
 	c, _, err := websocket.DefaultDialer.Dial(apiURL, headers)
@@ -922,23 +932,26 @@ func getPgJson(deviceEui string, deviceName string, pgLat int) PgJson {
 	return pg
 }
 
-func getDeviceJson(deviceEui string, deviceName string, appKey string, devLat int, payloadData string, region int, deviceSupportOTAA bool, deviceSupportClassB bool, deviceSupportClassC bool, config C2Config) DeviceJSON {
+func getDeviceJson(deviceType int, dataType int, axisId int, deviceEui string, deviceName string, appKey string, devLat int, payloadData string, region int, deviceSupportOTAA bool, deviceSupportClassB bool, deviceSupportClassC bool, config C2Config) DeviceJSON {
 	device := DeviceJSON{
 		ID: hashString(deviceEui),
 		Info: Info{
-			Name:    deviceName,
-			DevEUI:  deviceEui,
-			AppKey:  appKey,
-			DevAddr: "00000000",
-			NwkSKey: "00000000000000000000000000000000",
-			AppSKey: "00000000000000000000000000000000",
+			Name:       deviceName,
+			DeviceType: deviceType,
+			DataType:   dataType,
+			AxisId:     axisId,
+			DevEUI:     deviceEui,
+			AppKey:     appKey,
+			DevAddr:    "00000000",
+			NwkSKey:    "00000000000000000000000000000000",
+			AppSKey:    "00000000000000000000000000000000",
 			Location: Location{
 				Latitude:  float64(devLat),
 				Longitude: 0,
 				Altitude:  0,
 			},
 			Status: Status{
-				MType:   "ConfirmedDataUp",
+				MType:   "UnconfirmedDataUp",
 				Payload: payloadData,
 				Active:  true,
 				InfoUplink: struct {
@@ -1006,113 +1019,146 @@ var triDataSample string = ""
 var sDataSample string = ""
 var totalFilesS int = 0
 
-func GetDataSample(t string, config C2Config) string {
-	if loadSamples {
+// func GetDataSample(dataType string, axis string, config C2Config) string {
+// 	if loadSamples {
+// 		filesLFFTX, err := os.ReadDir(config.DataPathL + dataType)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		totalFilesLFFTX := len(filesLFFTX)
 
-		filesL, err := os.ReadDir(config.DataPathL)
-		if err != nil {
-			log.Fatal(err)
-		}
-		totalFilesL := len(filesL)
+// 		for i := 0; i < totalFilesLFFTX; i++ {
+// 			dataPath := config.DataPathL + dataType + string(filesLFFTX[0].Name()[0]) + strconv.Itoa(i) + ".bin"
+// 			file, err := os.Open(dataPath)
+// 			if err != nil {
+// 				fmt.Println("Error opening file:", err)
+// 				return ""
+// 			}
+// 			defer file.Close()
 
-		for i := 0; i < totalFilesL; i++ {
-			dataPath := config.DataPathL + filesL[i].Name()
-			file, err := os.Open(dataPath)
-			if err != nil {
-				fmt.Println("Error opening file:", err)
-				return ""
-			}
-			defer file.Close()
+// 			// Read binary data into a buffer
+// 			buffer := make([]byte, 128)
+// 			_, err = file.Read(buffer)
+// 			if err != nil {
+// 				fmt.Println("Error reading binary data:", err)
+// 				return ""
+// 			}
+// 			data := hex.EncodeToString(buffer)
+// 			fmt.Println(data)
+// 		}
+// 		loadSamples = false
+// 	}
 
-			// Read binary data into a buffer
-			buffer := make([]byte, 128)
-			_, err = file.Read(buffer)
-			if err != nil {
-				fmt.Println("Error reading binary data:", err)
-				return ""
-			}
-			data := hex.EncodeToString(buffer)
+// 	if axis == "x" {
+// 		return xDataSample
+// 	} else if t == "y" {
+// 		return yDataSample
+// 	} else if t == "z" {
+// 		return zDataSample
+// 	} else if t == "tri" {
+// 		return triDataSample
+// 	} else if t == "s" {
+// 		filesS, err := os.ReadDir(config.DataPathS)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		totalFilesS = len(filesS)
+// 		random := rand.New(rand.NewSource(time.Now().UnixNano()))
+// 		dataPath := config.DataPathS + filesS[random.Intn(totalFilesS)].Name()
 
-			if i < totalFilesL/3 {
-				xDataSample += data
-			}
-			if i >= totalFilesL/3 && i < totalFilesL*2/3 {
-				yDataSample += data
-			}
-			if i >= totalFilesL*2/3 {
-				zDataSample += data
-			}
-			triDataSample += data
-		}
-		loadSamples = false
-	}
+// 		file, err := os.Open(dataPath)
+// 		if err != nil {
+// 			fmt.Println("Error opening file:", err)
+// 			return ""
+// 		}
+// 		defer file.Close()
 
-	if t == "x" {
-		return xDataSample
-	} else if t == "y" {
-		return yDataSample
-	} else if t == "z" {
-		return zDataSample
-	} else if t == "tri" {
-		return triDataSample
-	} else if t == "s" {
-		filesS, err := os.ReadDir(config.DataPathS)
-		if err != nil {
-			log.Fatal(err)
-		}
-		totalFilesS = len(filesS)
-		random := rand.New(rand.NewSource(time.Now().UnixNano()))
-		dataPath := config.DataPathS + filesS[random.Intn(totalFilesS)].Name()
+// 		// Read binary data into a buffer
+// 		buffer := make([]byte, 128)
+// 		_, err = file.Read(buffer)
+// 		if err != nil {
+// 			fmt.Println("Error reading binary data:", err)
+// 			return ""
+// 		}
+// 		return hex.EncodeToString(buffer)
 
-		file, err := os.Open(dataPath)
-		if err != nil {
-			fmt.Println("Error opening file:", err)
-			return ""
-		}
-		defer file.Close()
+// 	}
+// 	return ""
+// }
 
-		// Read binary data into a buffer
-		buffer := make([]byte, 128)
-		_, err = file.Read(buffer)
-		if err != nil {
-			fmt.Println("Error reading binary data:", err)
-			return ""
-		}
-		return hex.EncodeToString(buffer)
+// func ReadDataSample(dataType int, deviceType int, axisId int, config C2Config) string {
+// 	if deviceType == 6199 {
+// 		//S-Type
+// 		return GetDataSample("s", config)
 
-	}
-	return ""
-}
+// 	} else if deviceType == 6165 {
+// 		//L-Type
 
-func ReadDataSample(deviceType int, axisId int, config C2Config) string {
-	if deviceType == 6199 {
-		//S-Type
-		return GetDataSample("s", config)
+// 		if dataType == 6163 {
+// 			//psd
+// 			if axisId == 6166 {
+// 				//x-axis
+// 				return GetDataSample("psd", "x", config)
 
-	} else if deviceType == 6165 {
-		//L-Type
+// 			} else if axisId == 6167 {
+// 				//y-axis
+// 				return GetDataSample("psd", "y", config)
 
-		if axisId == 6166 {
-			//x-axis
-			return GetDataSample("x", config)
+// 			} else if axisId == 6168 {
+// 				//z-axis
+// 				return GetDataSample("psd", "z", config)
 
-		} else if axisId == 6167 {
-			//y-axis
-			return GetDataSample("y", config)
+// 			} else if axisId == 6169 {
+// 				//tri-axial
+// 				return GetDataSample("psd", "tri", config)
 
-		} else if axisId == 6168 {
-			//z-axis
-			return GetDataSample("z", config)
+// 			}
 
-		} else if axisId == 6169 {
-			//tri-axial
-			return GetDataSample("tri", config)
+// 		} else if dataType == 6164 {
+// 			//fft
+// 			if axisId == 6166 {
+// 				//x-axis
+// 				return GetDataSample("fft", "x", config)
 
-		}
+// 			} else if axisId == 6167 {
+// 				//y-axis
+// 				return GetDataSample("fft", "y", config)
 
-	}
-	return ""
-}
+// 			} else if axisId == 6168 {
+// 				//z-axis
+// 				return GetDataSample("fft", "z", config)
+
+// 			} else if axisId == 6169 {
+// 				//tri-axial
+// 				return GetDataSample("fft", "tri", config)
+
+// 			}
+
+// 		} else if dataType == 6179 {
+// 			//fft-raw
+// 			if axisId == 6166 {
+// 				//x-axis
+// 				return GetDataSample("raw", "x", config)
+
+// 			} else if axisId == 6167 {
+// 				//y-axis
+// 				return GetDataSample("raw", "y", config)
+
+// 			} else if axisId == 6168 {
+// 				//z-axis
+// 				return GetDataSample("raw", "z", config)
+
+// 			} else if axisId == 6169 {
+// 				//tri-axial
+// 				return GetDataSample("raw", "tri", config)
+
+// 			}
+
+// 		}
+
+// 	}
+// 	return ""
+// }
 
 func getProfileMap(profileId float64, responseBatch ResponseBatch) map[string]interface{} {
 

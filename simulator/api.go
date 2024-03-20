@@ -39,6 +39,7 @@ type C2Config struct {
 	RXDurationOpen   int    `json:"rxDurationOpen"`
 	DataRate         int    `json:"dataRate"`
 	ConfigDirName    string `json:"configDirname"`
+	MaxDevices       int    `json:"maxDevices"`
 }
 
 func GetIstance() *Simulator {
@@ -86,10 +87,14 @@ func (s *Simulator) Run() {
 		s.turnONGateway(id)
 	}
 
+	i := 0
 	for _, id := range s.ActiveDevices {
-
+		if i >= config.MaxDevices {
+			break
+		}
 		s.turnONDevice(id)
 		time.Sleep(time.Duration(config.JoinDelay) * time.Second)
+		i++
 	}
 
 }

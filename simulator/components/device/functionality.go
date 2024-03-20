@@ -27,6 +27,7 @@ func (d *Device) Execute() {
 	for i := 0; i < len(uplinks); i++ {
 
 		data := d.SetInfo(uplinks[i], false)
+		time.Sleep(time.Duration(100) * time.Millisecond)
 		d.Class.SendData(data)
 
 		d.Print("Uplink sent", nil, util.PrintBoth)
@@ -375,7 +376,7 @@ func (d *Device) SwitchClass(class int) {
 
 }
 
-//se il dispositivo non supporta OTAA non può essere unjoined
+// se il dispositivo non supporta OTAA non può essere unjoined
 func (d *Device) UnJoined() bool {
 
 	if d.Info.Configuration.SupportedOtaa {
