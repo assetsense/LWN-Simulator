@@ -392,3 +392,42 @@ func OpenC2Json() C2Config {
 
 	return config
 }
+
+func FragmentationWithIds(seqIds []int, deviceType int, dataType int, axisId int, size int, payloadDiscard lorawan.Payload) []lorawan.DataPayload {
+
+	// fmt.Println(payloadDiscard.MarshalBinary())
+	var FRMPayload []lorawan.DataPayload
+
+	payloads := ReadDataSample(deviceType, dataType, axisId, config)
+
+	for _, seqId := range seqIds {
+		// fmt.Println(payloadBytes)
+		// payloadBytes := []byte(payload)
+		if seqId >= len(payloads) {
+			continue
+		}
+		payloadBytes := payloads[seqId]
+
+		if size == 0 {
+			return FRMPayload
+		}
+
+		nFrame := len(payloadBytes) / size
+
+		for i := 0; i <= nFrame; i++ {
+
+			var data lorawan.DataPayload
+
+			offset := i * size
+
+			if i != nFrame {
+				data.Bytes = payloadBytes[offset : offset+size]
+			} else {
+				data.Bytes = payloadBytes[offset:len(payloadBytes)]
+			}
+
+			FRMPayload = append(FRMPayload, data)
+		}
+	}
+	return FRMPayload
+}

@@ -951,7 +951,7 @@ func getDeviceJson(deviceType int, dataType int, axisId int, deviceEui string, d
 				Altitude:  0,
 			},
 			Status: Status{
-				MType:   "UnconfirmedDataUp",
+				MType:   "UnConfirmedDataUp",
 				Payload: payloadData,
 				Active:  true,
 				InfoUplink: struct {

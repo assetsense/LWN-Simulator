@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	JOINACCEPTDELAY1 = time.Duration(5 * time.Second)
-	JOINACCEPTDELAY2 = time.Duration(1 * time.Second)
+	JOINACCEPTDELAY1 = time.Duration(15 * time.Second)
+	JOINACCEPTDELAY2 = time.Duration(10 * time.Second)
 )
 
 func (d *Device) OtaaActivation() {

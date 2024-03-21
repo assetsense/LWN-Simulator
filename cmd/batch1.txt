@@ -1,4 +1,0 @@
-{
-    "msg_type": "batch_out",
-    "msg": "{"id":0,"lastSyncTime":1.709702653781E12,"org":0,"customerId":0,"fullImport":false,"finalBatch":true,"dataSize":164,"sequence":1,"data":1}
-}

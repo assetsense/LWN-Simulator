@@ -18,6 +18,8 @@ func (d *Device) Execute() {
 	var downlink *dl.InformationDownlink
 	var err error
 
+	config := OpenC2Json()
+
 	err = nil
 	downlink = nil
 
@@ -27,14 +29,14 @@ func (d *Device) Execute() {
 	for i := 0; i < len(uplinks); i++ {
 
 		data := d.SetInfo(uplinks[i], false)
-		time.Sleep(time.Duration(100) * time.Millisecond)
+		time.Sleep(time.Duration(config.PacketDelay) * time.Millisecond)
 		d.Class.SendData(data)
 
 		d.Print("Uplink sent", nil, util.PrintBoth)
 	}
 
 	d.Print("Open RXs", nil, util.PrintBoth)
-	phy := d.Class.ReceiveWindows(0, 0)
+	phy := d.Class.ReceiveWindows(3, 1)
 
 	if phy != nil {
 

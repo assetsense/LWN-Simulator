@@ -30,7 +30,10 @@ func (d *Device) Run() {
 
 	d.OtaaActivation()
 
-	ticker := time.NewTicker(d.Info.Configuration.SendInterval)
+	config := OpenC2Json()
+
+	// ticker := time.NewTicker(d.Info.Configuration.SendInterval)
+	ticker := time.NewTicker(time.Duration(config.SendInterval) * time.Second)
 
 	for {
 

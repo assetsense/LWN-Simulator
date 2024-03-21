@@ -1,10 +1,14 @@
 package device
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
 	"math/rand"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/arslab/lwnsimulator/simulator/components/device/classes"
@@ -20,6 +24,32 @@ const (
 	//MaxMargin is max value for margin (DevStatusReq)
 	MaxMargin = int8(64)
 )
+
+type C2Config struct {
+	C2ServerREST            string `json:"c2serverREST"`
+	C2ServerWS              string `json:"c2serverWS"`
+	Username                string `json:"username"`
+	Password                string `json:"password"`
+	CreateDevicesLWN        bool   `json:"createDevicesLWN"`
+	JoinDelay               int    `json:"joinDelay"`
+	DataPathS               string `json:"dataPathS"`
+	DataPathL               string `json:"dataPathL"`
+	SendInterval            int    `json:"sendInterval"`
+	AckTimeout              int    `json:"ackTimeout"`
+	RxDelay                 int    `json:"rxDelay"`
+	RXDurationOpen          int    `json:"rxDurationOpen"`
+	DataRate                int    `json:"dataRate"`
+	ConfigDirName           string `json:"configDirname"`
+	MgDeviceId              string `json:"mgDeviceId"`
+	MgPasscode              string `json:"mgPasscode"`
+	CreateDevicesChirpstack bool   `json:"createDevicesChirpstack"`
+	ChirpstackServer        string `json:"chirpstackServer"`
+	ApiToken                string `json:"apiToken"`
+	ApplicationId           string `json:"applicationId"`
+	ProfileId               string `json:"profileId"`
+	TenantId                string `json:"tenantId"`
+	PacketDelay             int    `json:"packetDelay"`
+}
 
 // ***************** MANAGE EXECUTE MAC COMMAND ******************
 // *********************Uplink***********************************
@@ -39,6 +69,26 @@ func (d *Device) newMACComands(CmdS []lorawan.Payload) {
 
 }
 
+func OpenC2Json() C2Config {
+	//open c2.json file
+	path := "c2.json"
+
+	//c2.json properties can be accessed by config.<property_name>
+	config := C2Config{}
+
+	c2Data, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error opening c2.json file:", err)
+	}
+
+	err = json.Unmarshal(c2Data, &config)
+	if err != nil {
+		fmt.Println("Error decoding c2.json file:", err)
+	}
+
+	return config
+}
+
 //*********************downlink***********************************
 
 func (d *Device) ExecuteMACCommand(downlink dl.InformationDownlink) {
@@ -52,11 +102,48 @@ func (d *Device) ExecuteMACCommand(downlink dl.InformationDownlink) {
 
 	if len(downlink.FOptsReceived) == 0 {
 		msg = "None MAC Command"
+
 	} else {
 		msg = "Execute MAC Commands"
 	}
 
 	d.Print(msg, nil, util.PrintBoth)
+
+	config := OpenC2Json()
+
+	dataPaylod := string(downlink.DataPayload)
+	tokens := strings.Split(dataPaylod, " ")
+
+	// Check if the first token indicates retransmission
+	if len(tokens) > 1 || tokens[0] == "T0" {
+		numIDsStr := tokens[1]
+		numIDs, _ := strconv.Atoi(numIDsStr)
+
+		sequenceIDs := tokens[2 : 2+numIDs]
+
+		// Print the extracted sequence IDs
+		d.Print("Retransmission,IDs:", nil, util.PrintBoth)
+		fmt.Println(sequenceIDs)
+		var sequenceIDsInt []int
+		for _, idStr := range sequenceIDs {
+			idInt, err := strconv.Atoi(idStr)
+			if err != nil {
+				fmt.Printf("Error converting %s to int: %v\n", idStr, err)
+				return
+			}
+			sequenceIDsInt = append(sequenceIDsInt, idInt)
+		}
+		uplinks := d.CreateUplinkWithIDs(sequenceIDsInt)
+		for i := 0; i < len(uplinks); i++ {
+
+			data := d.SetInfo(uplinks[i], false)
+			time.Sleep(time.Duration(config.PacketDelay) * time.Millisecond)
+			d.Class.SendData(data)
+
+			d.Print("Retransmission Uplink sent", nil, util.PrintBoth)
+		}
+		return
+	}
 
 	for _, cmd := range downlink.FOptsReceived {
 
