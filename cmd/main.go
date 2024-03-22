@@ -333,12 +333,13 @@ func AddDevicesToSimulatorWSHelperChirpstack(simulatorController cnt.SimulatorCo
 		grpc.WithBlock(),
 		grpc.WithPerRPCCredentials(APIToken(config.ApiToken)),
 		grpc.WithInsecure(), // remove this when using TLS
-		grpc.WithTimeout(5),
+		grpc.WithTimeout(15),
 	}
 
 	// connect to the gRPC server
 	conn, err := grpc.Dial(config.ChirpstackServer, dialOpts...)
 	if err != nil {
+		log.Println(err)
 		log.Println("[chirpstack] Chirpstack server is offline ")
 		return 0
 	}
@@ -360,7 +361,7 @@ func AddDevicesToSimulatorWSHelperChirpstack(simulatorController cnt.SimulatorCo
 		// deviceID, _ := deviceMap["id"].(float64)
 		deviceEui, _ := deviceMap["code"].(string)
 		deviceName, _ := deviceMap["name"].(string)
-		appKey, _ := deviceMap["key"].(string)
+		appKey, _ := deviceMap["nwKey"].(string)
 
 		if deviceType == 6149 {
 			//PG - gateway
@@ -450,7 +451,7 @@ func AddDevicesToSimulatorWSHelper(simulatorController cnt.SimulatorController, 
 		// deviceID, _ := deviceMap["id"].(float64)
 		deviceEui, _ := deviceMap["code"].(string)
 		deviceName, _ := deviceMap["name"].(string)
-		appKey, _ := deviceMap["key"].(string)
+		appKey, _ := deviceMap["nwKey"].(string)
 		axisId, _ := deviceMap["axis"].(float64)
 		profileId, _ := deviceMap["profileId"].(float64)
 
