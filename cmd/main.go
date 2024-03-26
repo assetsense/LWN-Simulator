@@ -333,7 +333,6 @@ func AddDevicesToSimulatorWSHelperChirpstack(simulatorController cnt.SimulatorCo
 		grpc.WithBlock(),
 		grpc.WithPerRPCCredentials(APIToken(config.ApiToken)),
 		grpc.WithInsecure(), // remove this when using TLS
-		grpc.WithTimeout(15),
 	}
 
 	// connect to the gRPC server
