@@ -15,7 +15,7 @@
     "mgDeviceId": "30233a09dab4d76a",
     "mgPasscode": "48c1da827eea971f",
     "createDevicesLWN": false,
-    "createDevicesChirpstack": false,
+    "createDevicesChirpstack": true,
     "chirpstackServer": "localhost:8080",
     "apiToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjZjYWZhMWFlLTM0NmMtNGYwNC1hMTAzLTRhY2Y3NmEwZDhmYyIsInR5cCI6ImtleSJ9.C6IRV-1VRv2qYV9ThmbEHlPvfPzHw4IJQDR5HU6jOsc",
     "applicationId": "d752e719-e3c9-4156-801f-bb55af591c3d",
