@@ -36,7 +36,7 @@ func (d *Device) Execute() {
 	}
 
 	d.Print("Open RXs", nil, util.PrintBoth)
-	phy := d.Class.ReceiveWindows(3, 1)
+	phy := d.Class.ReceiveWindows(0, 0)
 
 	if phy != nil {
 

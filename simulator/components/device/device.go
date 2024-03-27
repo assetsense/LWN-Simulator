@@ -26,7 +26,7 @@ type Device struct {
 // *******************Intern func*******************/
 func (d *Device) Run() {
 
-	defer d.Resources.ExitGroup.Done()
+	// defer d.Resources.ExitGroup.Done()
 
 	d.OtaaActivation()
 
@@ -60,7 +60,8 @@ func (d *Device) Run() {
 				d.Execute()
 
 			} else {
-				d.OtaaActivation()
+				break
+				// d.OtaaActivation()
 			}
 
 		}

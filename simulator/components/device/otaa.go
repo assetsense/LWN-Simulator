@@ -13,14 +13,14 @@ import (
 )
 
 const (
-	JOINACCEPTDELAY1 = time.Duration(15 * time.Second)
-	JOINACCEPTDELAY2 = time.Duration(10 * time.Second)
+	JOINACCEPTDELAY1 = time.Duration(5 * time.Second)
+	JOINACCEPTDELAY2 = time.Duration(1 * time.Second)
 )
 
 func (d *Device) OtaaActivation() {
 
-	for !d.Info.Status.Joined {
-
+	// for !d.Info.Status.Joined {
+	if !d.Info.Status.Joined {
 		d.Info.Status.Mode = util.Activation
 
 		if !d.CanExecute() { //stop simulator

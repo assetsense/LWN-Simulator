@@ -40,6 +40,7 @@ type C2Config struct {
 	DataRate         int    `json:"dataRate"`
 	ConfigDirName    string `json:"configDirname"`
 	MaxDevices       int    `json:"maxDevices"`
+	ParallelDevices  int    `json:"parallelDevices"`
 }
 
 func GetIstance() *Simulator {
@@ -87,14 +88,39 @@ func (s *Simulator) Run() {
 		s.turnONGateway(id)
 	}
 
-	i := 0
-	for _, id := range s.ActiveDevices {
-		if i >= config.MaxDevices {
+	i := 1
+	n := config.ParallelDevices
+	// for _, id := range s.ActiveDevices {
+	// 	if i > config.MaxDevices {
+	// 		break
+	// 	}
+	// 	s.turnONDevice(id)
+	// 	// for !s.Devices[id].Info.Status.Joined {
+	// 	// 	time.Sleep(1 * time.Second)
+	// 	// }
+	// 	if i%n == 0 {
+	// 		time.Sleep(time.Duration(config.JoinDelay) * time.Second)
+	// 	}
+	// 	i++
+	// }
+
+	for {
+		i = 1
+		breakFlag := true
+		for _, id := range s.ActiveDevices {
+			if !s.Devices[id].Info.Status.Joined {
+				s.turnONDevice(id)
+				if i%n == 0 {
+					time.Sleep(time.Duration(config.JoinDelay) * time.Second)
+				}
+				breakFlag = false
+			}
+			i++
+		}
+		if breakFlag {
 			break
 		}
-		s.turnONDevice(id)
-		time.Sleep(time.Duration(config.JoinDelay) * time.Second)
-		i++
+
 	}
 
 }
