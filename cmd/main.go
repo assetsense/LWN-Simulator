@@ -189,7 +189,6 @@ func main() {
 	}
 
 	if config.CreateDevicesChirpstack {
-
 		AddDevicesToChirpstackWS(simulatorController, config)
 	}
 
@@ -223,7 +222,7 @@ func GetDevicesFromC2WSChirpstack(simulatorController cnt.SimulatorController, c
 	// Establish WebSocket connection
 	c, _, err := websocket.DefaultDialer.Dial(apiURL, headers)
 	if err != nil {
-		log.Fatal("Dial error:", err)
+		log.Fatal("C2 Websocket server is offline", err)
 	}
 
 	// Send the request message
@@ -362,6 +361,13 @@ func AddDevicesToSimulatorWSHelperChirpstack(simulatorController cnt.SimulatorCo
 		deviceName, _ := deviceMap["name"].(string)
 		appKey, _ := deviceMap["nwKey"].(string)
 
+		if len(appKey) != 32 {
+			continue
+		}
+		if len(deviceEui) != 16 {
+			continue
+		}
+
 		if deviceType == 6149 {
 			//PG - gateway
 
@@ -451,6 +457,12 @@ func AddDevicesToSimulatorWSHelper(simulatorController cnt.SimulatorController, 
 		deviceEui, _ := deviceMap["code"].(string)
 		deviceName, _ := deviceMap["name"].(string)
 		appKey, _ := deviceMap["nwKey"].(string)
+		if len(appKey) != 32 {
+			continue
+		}
+		if len(deviceEui) != 16 {
+			continue
+		}
 		axisId, _ := deviceMap["axis"].(float64)
 		profileId, _ := deviceMap["profileId"].(float64)
 
@@ -792,7 +804,7 @@ func GetDevicesFromC2WS(simulatorController cnt.SimulatorController, config C2Co
 	// Establish WebSocket connection
 	c, _, err := websocket.DefaultDialer.Dial(apiURL, headers)
 	if err != nil {
-		log.Fatal("Dial error:", err)
+		log.Fatal("C2 Websocket server is offline:", err)
 	}
 
 	// Send the request message
@@ -823,6 +835,8 @@ func GetDevicesFromC2WS(simulatorController cnt.SimulatorController, config C2Co
 			continue
 		}
 
+		// log.Println(responseBatch)
+
 		if responseBatch.MsgType == "resp_bonded_devices" {
 
 			if responseBatch.Sequence != prevSequence+1 {
@@ -835,9 +849,16 @@ func GetDevicesFromC2WS(simulatorController cnt.SimulatorController, config C2Co
 				dataSize = responseBatch.DataSize
 			}
 
-			// fmt.Println(bondedDevices)
+			log.Println("Sequence Number: ", responseBatch.Sequence)
 
-			devicesReceived += AddDevicesToSimulatorWSHelper(simulatorController, config, responseBatch)
+			// fmt.Println(bondedDevices)
+			devicesInBatch := 0
+
+			devicesInBatch = AddDevicesToSimulatorWSHelper(simulatorController, config, responseBatch)
+
+			log.Println("Number of devices: ", devicesInBatch)
+
+			devicesReceived += devicesInBatch
 
 			if responseBatch.FinalBatch {
 				log.Println("Devices received: ", devicesReceived, " | Total: ", dataSize)
