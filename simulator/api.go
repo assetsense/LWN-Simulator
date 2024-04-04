@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"sort"
 	"strings"
 	"time"
 
@@ -104,18 +105,32 @@ func (s *Simulator) Run() {
 	// 	i++
 	// }
 
+	// Extract keys from the map
+	keys := make([]int, 0, len(s.ActiveDevices))
+	for k := range s.ActiveDevices {
+		keys = append(keys, k)
+	}
+
+	// Sort the keys
+	sort.Ints(keys)
+
 	for {
 		i = 1
+		j := 1
 		breakFlag := true
-		for _, id := range s.ActiveDevices {
+		for _, id := range keys {
+			if j > config.MaxDevices {
+				break
+			}
 			if !s.Devices[id].Info.Status.Joined {
 				s.turnONDevice(id)
 				if i%n == 0 {
 					time.Sleep(time.Duration(config.JoinDelay) * time.Second)
 				}
 				breakFlag = false
+				i++
 			}
-			i++
+			j++
 		}
 		if breakFlag {
 			break
