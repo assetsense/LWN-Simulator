@@ -49,6 +49,7 @@ type C2Config struct {
 	ProfileId               string `json:"profileId"`
 	TenantId                string `json:"tenantId"`
 	PacketDelay             int    `json:"packetDelay"`
+	MaxDevicesTransmit      int    `json:"maxDevicesTransmit"`
 }
 
 // ***************** MANAGE EXECUTE MAC COMMAND ******************

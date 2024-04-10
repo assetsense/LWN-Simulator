@@ -64,6 +64,8 @@ func (s *Simulator) AddWebSocket(WebSocket *socketio.Conn) {
 	s.Resources.AddWebSocket(WebSocket)
 }
 
+var devicesTransmitCnt int = 1
+
 func (s *Simulator) Run() {
 
 	s.State = util.Running
@@ -123,7 +125,7 @@ func (s *Simulator) Run() {
 				break
 			}
 			if !s.Devices[id].Info.Status.Joined {
-				s.turnONDevice(id)
+				s.turnONDevice(id, &devicesTransmitCnt)
 				if i%n == 0 {
 					time.Sleep(time.Duration(config.JoinDelay) * time.Second)
 				}
@@ -135,6 +137,7 @@ func (s *Simulator) Run() {
 		if breakFlag {
 			break
 		}
+		time.Sleep(time.Duration(config.JoinDelay) * time.Second)
 
 	}
 
@@ -391,7 +394,7 @@ func (s *Simulator) SetDevice(device *dev.Device, update bool) (int, int, error)
 		s.ActiveDevices[device.Id] = device.Id
 
 		if s.State == util.Running {
-			s.turnONDevice(device.Id)
+			s.turnONDevice(device.Id, &devicesTransmitCnt)
 		}
 
 	} else {
@@ -429,7 +432,7 @@ func (s *Simulator) DeleteDevice(Id int) bool {
 func (s *Simulator) ToggleStateDevice(Id int) {
 
 	if s.Devices[Id].State == util.Stopped {
-		s.turnONDevice(Id)
+		s.turnONDevice(Id, &devicesTransmitCnt)
 	} else if s.Devices[Id].State == util.Running {
 		s.turnOFFDevice(Id)
 	}

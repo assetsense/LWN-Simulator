@@ -185,7 +185,7 @@ func (s *Simulator) saveStatus() {
 	s.Print("Status saved", nil, util.PrintOnlyConsole)
 }
 
-func (s *Simulator) turnONDevice(Id int) {
+func (s *Simulator) turnONDevice(Id int, devicesTransmitCnt *int) {
 
 	infoDev := mfw.InfoDevice{
 		DevEUI:   s.Devices[Id].Info.DevEUI,
@@ -195,7 +195,7 @@ func (s *Simulator) turnONDevice(Id int) {
 	s.Forwarder.AddDevice(infoDev)
 
 	s.Devices[Id].Setup(&s.Resources, &s.Forwarder)
-	s.Devices[Id].TurnON()
+	s.Devices[Id].TurnON(devicesTransmitCnt)
 	s.ActiveDevices[Id] = Id
 
 	// s.Resources.WebSocket.Emit(socket.EventResponseCommand, s.Devices[Id].Info.Name+" Turn ON")

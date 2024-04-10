@@ -77,10 +77,10 @@ func (d *Device) TurnOFF() {
 
 }
 
-func (d *Device) TurnON() {
+func (d *Device) TurnON(devicesTransmitCnt *int) {
 	d.State = util.Running
 
-	go d.Run()
+	go d.Run(devicesTransmitCnt)
 
 	d.Print("Turn ON", nil, util.PrintBoth)
 }

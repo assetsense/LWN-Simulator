@@ -24,13 +24,18 @@ type Device struct {
 }
 
 // *******************Intern func*******************/
-func (d *Device) Run() {
+func (d *Device) Run(devicesTransmitCnt *int) {
 
 	// defer d.Resources.ExitGroup.Done()
 
 	d.OtaaActivation()
 
 	config := OpenC2Json()
+
+	if *devicesTransmitCnt > config.MaxDevicesTransmit {
+		return
+	}
+	*devicesTransmitCnt += 1
 
 	// ticker := time.NewTicker(d.Info.Configuration.SendInterval)
 	ticker := time.NewTicker(time.Duration(config.SendInterval) * time.Second)
