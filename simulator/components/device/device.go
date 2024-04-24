@@ -32,10 +32,15 @@ func (d *Device) Run(devicesTransmitCnt *int) {
 
 	config := OpenC2Json()
 
-	if *devicesTransmitCnt > config.MaxDevicesTransmit {
-		return
+	if d.CanExecute() {
+
+		if d.Info.Status.Joined {
+			if *devicesTransmitCnt > config.MaxDevicesTransmit {
+				return
+			}
+			*devicesTransmitCnt += 1
+		}
 	}
-	*devicesTransmitCnt += 1
 
 	// ticker := time.NewTicker(d.Info.Configuration.SendInterval)
 	ticker := time.NewTicker(time.Duration(config.SendInterval) * time.Second)
@@ -69,6 +74,8 @@ func (d *Device) Run(devicesTransmitCnt *int) {
 				// d.OtaaActivation()
 			}
 
+		} else {
+			break
 		}
 
 	}

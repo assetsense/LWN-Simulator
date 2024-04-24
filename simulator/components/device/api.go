@@ -78,6 +78,7 @@ func (d *Device) TurnOFF() {
 }
 
 func (d *Device) TurnON(devicesTransmitCnt *int) {
+
 	d.State = util.Running
 
 	go d.Run(devicesTransmitCnt)

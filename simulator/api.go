@@ -115,28 +115,34 @@ func (s *Simulator) Run() {
 
 	// Sort the keys
 	sort.Ints(keys)
-
+	secondIteration := false
 	for {
 		i = 1
 		j := 1
 		breakFlag := true
 		for _, id := range keys {
-			if j > config.MaxDevices {
-				break
-			}
 			if !s.Devices[id].Info.Status.Joined {
-				s.turnONDevice(id, &devicesTransmitCnt)
+				if secondIteration {
+					s.Devices[id].TurnON(&devicesTransmitCnt)
+					// fmt.Println(devicesTransmitCnt)
+				} else {
+					s.turnONDevice(id, &devicesTransmitCnt)
+				}
 				if i%n == 0 {
 					time.Sleep(time.Duration(config.JoinDelay) * time.Second)
 				}
 				breakFlag = false
 				i++
 			}
+			if j > config.MaxDevices {
+				break
+			}
 			j++
 		}
 		if breakFlag {
 			break
 		}
+		secondIteration = true
 		time.Sleep(time.Duration(config.JoinDelay) * time.Second)
 
 	}
