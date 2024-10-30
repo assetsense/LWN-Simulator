@@ -234,6 +234,31 @@ func (up *InfoUplink) UnmarshalJSON(data []byte) error {
 func GetDataSample(dataType string, config C2Config) [][]byte {
 	var samples [][]byte
 	if dataType == "s" {
+		//info packet
+		// infoPath := config.DataPathS + "i.bin"
+		// ifile, err := os.Open(infoPath)
+		// if err != nil {
+		// 	fmt.Println("Error opening file:", err)
+		// 	return nil
+		// }
+		// defer ifile.Close()
+
+		// ifileInfo, err := ifile.Stat()
+		// if err != nil {
+		// 	fmt.Println("Error:", err)
+		// 	return nil
+		// }
+		// ifileSize := ifileInfo.Size()
+
+		// // Read binary data into a buffer
+		// ibuffer := make([]byte, ifileSize)
+		// _, err = ifile.Read(ibuffer)
+		// if err != nil {
+		// 	fmt.Println("Error reading binary data:", err)
+		// 	return nil
+		// }
+		// samples = append(samples, ibuffer)
+		// end of info packet
 		//s-type
 		dataPath := config.DataPathS + "s.bin"
 		file, err := os.Open(dataPath)

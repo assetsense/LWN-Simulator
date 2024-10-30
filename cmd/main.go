@@ -666,7 +666,7 @@ func AddDevicesToSimulatorREST(simulatorController cnt.SimulatorController, conf
 						FPort int `json:"fport"`
 						FCnt  int `json:"fcnt"`
 					}{
-						FPort: 1,
+						FPort: 2,
 						FCnt:  1,
 					},
 					FCntDown: 0,
@@ -979,7 +979,7 @@ func getDeviceJson(deviceType int, dataType int, axisId int, deviceEui string, d
 					FPort int `json:"fport"`
 					FCnt  int `json:"fcnt"`
 				}{
-					FPort: 1,
+					FPort: 2,
 					FCnt:  1,
 				},
 				FCntDown: 0,
@@ -1205,6 +1205,7 @@ func getProfileMap(profileId float64, responseBatch ResponseBatch) map[string]in
 }
 
 func getRegionId(region string) int {
+	return 1
 	if region == "EU868" {
 		return 1
 	}
