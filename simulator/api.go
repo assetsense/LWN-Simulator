@@ -134,7 +134,7 @@ func (s *Simulator) Run() {
 				breakFlag = false
 				i++
 			}
-			if j > config.MaxDevices {
+			if j >= config.MaxDevices {
 				break
 			}
 			j++

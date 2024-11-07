@@ -234,8 +234,8 @@ func (up *InfoUplink) UnmarshalJSON(data []byte) error {
 func GetDataSample(dataType string, config C2Config) [][]byte {
 	var samples [][]byte
 	if dataType == "s" {
-		//info packet
-		// infoPath := config.DataPathS + "i.bin"
+		// info packet
+		// infoPath := config.DataPathS + "info.bin"
 		// ifile, err := os.Open(infoPath)
 		// if err != nil {
 		// 	fmt.Println("Error opening file:", err)
@@ -295,6 +295,12 @@ func GetDataSample(dataType string, config C2Config) [][]byte {
 	totalFilesL := len(filesL)
 
 	for i := 0; i < totalFilesL; i++ {
+		// var dataPath string
+		// if i == -1 {
+		// 	dataPath = config.DataPathL + dataType + "info.bin"
+		// } else {
+		// 	dataPath = config.DataPathL + dataType + string(filesL[0].Name()[0]) + strconv.Itoa(i) + ".bin"
+		// }
 		dataPath := config.DataPathL + dataType + string(filesL[0].Name()[0]) + strconv.Itoa(i) + ".bin"
 		file, err := os.Open(dataPath)
 		if err != nil {

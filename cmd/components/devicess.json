@@ -1,0 +1,74 @@
+{
+    "1003614162": {
+		"id": 1003614162,
+		"info": {
+			"devEUI": "32a4b420df9e1198",
+			"devAddr": "00000000",
+			"nwkSKey": "00000000000000000000000000000000",
+			"appSKey": "00000000000000000000000000000000",
+			"appKey": "85aa06cae28b0cf5b405e2b05105ccc8",
+			"name": "VB-device-432",
+			"deviceType": 6165,
+			"dataType": 6164,
+			"axisId": 6169,
+			"status": {
+				"mtype": "UnConfirmedDataUp",
+				"payload": "",
+				"active": true,
+				"infoUplink": {
+					"fport": 2,
+					"fcnt": 1
+				},
+				"fcntDown": 0
+			},
+			"configuration": {
+				"region": 1,
+				"sendInterval": 10,
+				"ackTimeout": 2,
+				"range": 10000,
+				"disableFCntDown": true,
+				"supportedOtaa": true,
+				"supportedADR": false,
+				"supportedFragment": true,
+				"supportedClassB": false,
+				"supportedClassC": false,
+				"dataRate": 5,
+				"rx1DROffset": 0,
+				"nbRetransmission": 1
+			},
+			"location": {
+				"latitude": 11450,
+				"longitude": 0,
+				"altitude": 0
+			},
+			"rxs": [
+				{
+					"delay": 3000,
+					"durationOpen": 10000,
+					"channel": {
+						"active": false,
+						"enableUplink": false,
+						"freqUplink": 0,
+						"freqDownlink": 0,
+						"minDR": 0,
+						"maxDR": 0
+					},
+					"dataRate": 5
+				},
+				{
+					"delay": 3000,
+					"durationOpen": 10000,
+					"channel": {
+						"active": true,
+						"enableUplink": false,
+						"freqUplink": 0,
+						"freqDownlink": 869525000,
+						"minDR": 0,
+						"maxDR": 0
+					},
+					"dataRate": 5
+				}
+			]
+		}
+	}
+}
