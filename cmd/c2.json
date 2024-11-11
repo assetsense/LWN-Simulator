@@ -6,7 +6,7 @@
     "joinDelay": 5,
     "dataPathS": "datasamples/stype_sample/",
     "dataPathL": "datasamples/ltype_sample/",
-    "sendInterval": 240,
+    "sendInterval": 20,
     "ackTimeout": 3,
     "rxDelay": 3000,
     "rxDurationOpen": 10000,
@@ -16,13 +16,13 @@
     "mgPasscode": "1096d03fae5dc178",
     "createDevicesLWN": false,
     "createDevicesChirpstack": false,
-    "chirpstackServer": "192.168.0.100:8080",
-    "apiToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6Ijg2NjgzYzEyLWJmYTctNDJiMy04MmM0LTg1MGYxZTJmMWNmMSIsInR5cCI6ImtleSJ9.r8wQcucl0xx2jHKstKuec39lla2O4ze_Yhi1X6cpcMo",
+    "chirpstackServer": "192.168.0.133:8080",
+    "apiToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjYxNmIzMDkyLWI0ZjctNDAzZS1hYjQ0LWIyMTVmOTI1YjIxNiIsInR5cCI6ImtleSJ9.09Ff34Rz_nMDy-alYB4tpXiGEEwt-iM6_1BCaGuYXL8",
     "applicationId": "d58b85ce-243b-45ca-85fd-6cbb88b03548",
     "profileId": "e2dd4749-937a-41ac-beaa-17a41ce500be",
     "tenantId": "c6d43ce2-f50c-46cb-83a0-b999229daf03",
-    "maxDevices": 2000,
-    "maxDevicesTransmit": 2000,
-    "packetDelay": 2000,
-    "parallelDevices": 5
+    "maxDevices": 1,
+    "maxDevicesTransmit": 1,
+    "packetDelay": 100,
+    "parallelDevices": 1
 }

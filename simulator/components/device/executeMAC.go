@@ -8,7 +8,6 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/arslab/lwnsimulator/simulator/components/device/classes"
@@ -113,27 +112,44 @@ func (d *Device) ExecuteMACCommand(downlink dl.InformationDownlink) {
 	config := OpenC2Json()
 
 	dataPaylod := string(downlink.DataPayload)
-	tokens := strings.Split(dataPaylod, " ")
+	// fmt.Println("datapayload: " + dataPaylod)
+	// tokens := strings.Split(dataPaylod, " ")
+	tokens := dataPaylod
 
 	// Check if the first token indicates retransmission
-	if len(tokens) > 1 || tokens[0] == "T0" {
-		numIDsStr := tokens[1]
-		numIDs, _ := strconv.Atoi(numIDsStr)
+	if len(tokens) > 2 && tokens[0:2] == "T0" {
 
-		sequenceIDs := tokens[2 : 2+numIDs]
+		trimmed := dataPaylod[2:] // This removes the first 2 characters ("T0")
+		//Extract the length (the first 4 characters after "T0")
+		lengthHex := trimmed[:4]                          // First 4 characters are the length of the integers that follow
+		length, err := strconv.ParseInt(lengthHex, 10, 0) // Convert the length (hex) to a decimal integer
+		if err != nil {
+			fmt.Println("Error parsing length '%s' as hexadecimal: %v", lengthHex, err)
+		}
 
 		// Print the extracted sequence IDs
 		d.Print("Retransmission,IDs:", nil, util.PrintBoth)
-		fmt.Println(sequenceIDs)
+		// fmt.Println(dataPaylod)
 		var sequenceIDsInt []int
-		for _, idStr := range sequenceIDs {
-			idInt, err := strconv.Atoi(idStr)
+		remaining := trimmed[4:]
+		// fmt.Println("remaining:")
+		// fmt.Println(remaining)
+		// fmt.Println("length:")
+		// fmt.Println(length)
+		j := 0
+		for i := 0; i < int(length); i++ {
+			j = i * 4
+			// fmt.Println("i,J:")
+			// fmt.Println(i)
+			// fmt.Println(j)
+			chunk := remaining[j : j+4]                // Get the next 4-character chunk
+			num, err := strconv.ParseInt(chunk, 10, 0) // Convert the 4-character chunk to an integer (hexadecimal to decimal)
 			if err != nil {
-				fmt.Printf("Error converting %s to int: %v\n", idStr, err)
-				return
+				fmt.Println("Error converting '%s' to integer: %v", chunk, err)
 			}
-			sequenceIDsInt = append(sequenceIDsInt, idInt)
+			sequenceIDsInt = append(sequenceIDsInt, int(num))
 		}
+		fmt.Println(sequenceIDsInt)
 		uplinks := d.CreateUplinkWithIDs(sequenceIDsInt)
 		for i := 0; i < len(uplinks); i++ {
 
@@ -141,7 +157,7 @@ func (d *Device) ExecuteMACCommand(downlink dl.InformationDownlink) {
 			time.Sleep(time.Duration(config.PacketDelay) * time.Millisecond)
 			d.Class.SendData(data)
 
-			d.Print("Retransmission Uplink sent", nil, util.PrintBoth)
+			d.Print("Retransmission Uplink sent- seq id:"+strconv.Itoa(sequenceIDsInt[i]), nil, util.PrintBoth)
 		}
 		return
 	}

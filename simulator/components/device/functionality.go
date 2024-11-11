@@ -3,6 +3,7 @@ package device
 import (
 	"fmt"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/arslab/lwnsimulator/simulator/components/device/classes"
@@ -32,7 +33,7 @@ func (d *Device) Execute() {
 		time.Sleep(time.Duration(config.PacketDelay) * time.Millisecond)
 		d.Class.SendData(data)
 
-		d.Print("Uplink sent", nil, util.PrintBoth)
+		d.Print("Uplink sent - seq id:"+strconv.Itoa(i), nil, util.PrintBoth)
 	}
 
 	d.Print("Open RXs", nil, util.PrintBoth)
