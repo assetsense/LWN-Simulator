@@ -2,11 +2,11 @@
 	"1008548409": {
 		"id": 1008548409,
 		"info": {
-			"macAddress": "9296d9f7fb842cb3",
+			"macAddress": "0016c001ff1a243c",
 			"keepAlive": 30,
 			"active": true,
 			"typeGateway": false,
-			"name": "PG-44",
+			"name": "PG-HYD1",
 			"location": {
 				"latitude": 0,
 				"longitude": 0,

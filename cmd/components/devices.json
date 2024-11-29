@@ -2,12 +2,12 @@
     "1003614162": {
 		"id": 1003614162,
 		"info": {
-			"devEUI": "32a4b420df9e1198",
+			"devEUI": "1450303679325520",
 			"devAddr": "00000000",
 			"nwkSKey": "00000000000000000000000000000000",
 			"appSKey": "00000000000000000000000000000000",
-			"appKey": "85aa06cae28b0cf5b405e2b05105ccc8",
-			"name": "VB-device-432",
+			"appKey": "7e654d591a14256a3b1c735f72336c3b",
+			"name": "VB-HYD3",
 			"deviceType": 6165,
 			"dataType": 6164,
 			"axisId": 6169,
@@ -24,7 +24,7 @@
 			"configuration": {
 				"region": 1,
 				"sendInterval": 10,
-				"ackTimeout": 2,
+				"ackTimeout": 0,
 				"range": 10000,
 				"disableFCntDown": true,
 				"supportedOtaa": true,
@@ -43,7 +43,7 @@
 			},
 			"rxs": [
 				{
-					"delay": 3000,
+					"delay": 0,
 					"durationOpen": 10000,
 					"channel": {
 						"active": false,
@@ -56,7 +56,7 @@
 					"dataRate": 5
 				},
 				{
-					"delay": 3000,
+					"delay": 0,
 					"durationOpen": 10000,
 					"channel": {
 						"active": true,

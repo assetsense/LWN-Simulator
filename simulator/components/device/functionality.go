@@ -107,6 +107,100 @@ func (d *Device) Execute() {
 
 }
 
+// with rx window on every uplink
+func (d *Device) Execute2() {
+
+	var downlink *dl.InformationDownlink
+	var err error
+
+	config := OpenC2Json()
+
+	err = nil
+	downlink = nil
+
+	d.SwitchChannel()
+
+	uplinks := d.CreateUplink()
+	for i := 0; i < len(uplinks); i++ {
+
+		data := d.SetInfo(uplinks[i], false)
+		time.Sleep(time.Duration(config.PacketDelay) * time.Millisecond)
+		d.Class.SendData(data)
+
+		d.Print("Uplink sent - seq id:"+strconv.Itoa(i), nil, util.PrintBoth)
+
+		d.Print("Open RXs", nil, util.PrintBoth)
+		phy := d.Class.ReceiveWindows(0, 0)
+
+		if phy != nil {
+
+			d.Print("Downlink Received", nil, util.PrintBoth)
+
+			downlink, err = d.ProcessDownlink(*phy)
+			if err != nil {
+				d.Print("", err, util.PrintBoth)
+				return
+			}
+
+			if downlink != nil { //downlink ricevuto
+
+				d.ExecuteMACCommand(*downlink)
+
+				if d.Info.Status.Mode != util.Retransmission {
+					d.FPendingProcedure(downlink)
+				}
+
+			}
+
+		} else {
+
+			d.Print("None downlinks Received", nil, util.PrintBoth)
+
+			// timerAckTimeout := time.NewTimer(d.Info.Configuration.AckTimeout)
+			// <-timerAckTimeout.C
+			// d.Print("ACK Timeout", nil, util.PrintBoth)
+
+		}
+	}
+
+	d.ADRProcedure()
+
+	//retransmission
+	switch d.Info.Status.LastMType {
+
+	case lorawan.ConfirmedDataUp:
+
+		if d.Class.GetClass() == classes.ClassC {
+			if d.Info.Status.InfoClassC.GetACK() {
+				return
+			}
+		}
+
+		err := d.Class.RetransmissionCData(downlink)
+		if err != nil {
+
+			d.Print("", err, util.PrintBoth)
+
+			d.UnJoined()
+
+		}
+
+		if d.Info.Status.Mode == util.Retransmission {
+
+			d.Info.Status.DataRate = rp.DecrementDataRate(d.Info.Configuration.Region, d.Info.Status.DataRate)
+
+		}
+
+	case lorawan.UnconfirmedDataUp:
+
+		err := d.Class.RetransmissionUnCData(downlink)
+		if err != nil {
+			d.Print("", err, util.PrintBoth)
+		}
+	}
+
+}
+
 func (d *Device) FPendingProcedure(downlink *dl.InformationDownlink) {
 
 	var err error

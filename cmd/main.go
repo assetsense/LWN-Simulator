@@ -1205,7 +1205,7 @@ func getProfileMap(profileId float64, responseBatch ResponseBatch) map[string]in
 }
 
 func getRegionId(region string) int {
-	return 1
+	// return 1
 	if region == "EU868" {
 		return 1
 	}

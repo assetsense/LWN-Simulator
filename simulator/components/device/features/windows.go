@@ -37,7 +37,6 @@ func (w *Window) OpenWindow(Delay time.Duration, ReceivedDownlink *dl.ReceivedDo
 	if Delay == 0 {
 		Delay = w.Delay
 	}
-
 	timerWindow := time.NewTimer(Delay)
 	<-timerWindow.C //delay
 	timerWindow.Stop()

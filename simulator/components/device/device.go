@@ -43,20 +43,46 @@ func (d *Device) Run(devicesTransmitCnt *int) {
 	}
 
 	// ticker := time.NewTicker(d.Info.Configuration.SendInterval)
-	ticker := time.NewTicker(time.Duration(config.SendInterval) * time.Second)
+	// ticker := time.NewTicker(time.Duration(config.SendInterval) * time.Second)
+
+	// for {
+
+	// 	select {
+
+	// 	case <-ticker.C:
+	// 		break
+
+	// 	case <-d.Exit:
+	// 		d.Print("Turn OFF", nil, util.PrintBoth)
+	// 		return
+	// 	}
+
+	// 	if d.CanExecute() {
+
+	// 		if d.Info.Status.Joined {
+
+	// 			if d.Info.Configuration.SupportedClassC {
+	// 				d.SwitchClass(classes.ClassC)
+	// 			} else if d.Info.Configuration.SupportedClassB {
+	// 				d.SwitchClass(classes.ClassB)
+	// 			}
+
+	// 			d.Execute()
+
+	// 		} else {
+	// 			break
+	// 			// d.OtaaActivation()
+	// 		}
+
+	// 	} else {
+	// 		break
+	// 	}
+
+	// }
 
 	for {
 
-		select {
-
-		case <-ticker.C:
-			break
-
-		case <-d.Exit:
-			d.Print("Turn OFF", nil, util.PrintBoth)
-			return
-		}
-
+		// time.Sleep(time.Duration(config.SendInterval) * time.Second)
 		if d.CanExecute() {
 
 			if d.Info.Status.Joined {
@@ -77,6 +103,8 @@ func (d *Device) Run(devicesTransmitCnt *int) {
 		} else {
 			break
 		}
+
+		time.Sleep(time.Duration(config.SendInterval) * time.Second)
 
 	}
 
